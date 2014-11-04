@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">TranSMART Client</string>
-    <string name="hello_world">Hello tranSMART!</string>
+    <string name="hello_world">Hello tranSMART world!</string>
     <string name="action_settings">Settings</string>
 
 </resources>

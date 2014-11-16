@@ -2,7 +2,11 @@
 <resources>
 
     <string name="app_name">TranSMART Client</string>
-    <string name="hello_world">Hello tranSMART world!</string>
+    <string name="welcomeText">Example server:</string>
+    <string name="urlExample">http://75.124.74.46:5880/transmart</string>
+    <string name="loginExample">Login with admin/admin.</string>
+    <string name="serverUrl">http://myserver.com/transmart</string>
+    <string name="button_submit">Connect</string>
     <string name="action_settings">Settings</string>
 
 </resources>

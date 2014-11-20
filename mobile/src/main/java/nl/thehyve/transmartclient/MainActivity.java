@@ -1,20 +1,28 @@
 package nl.thehyve.transmartclient;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,7 +52,7 @@ public class MainActivity extends Activity {
         {
             Log.d("TranSMART","Received uri");
             String code = uri.getQueryParameter("code");
-            Toast toast = Toast.makeText(this, "Received OAuth code: " + code, Toast.LENGTH_LONG);
+            Toast toast = Toast.makeText(this, "Received OAuth code: " + code, Toast.LENGTH_SHORT);
             toast.show();
             Log.d("TranSMART","Received OAuth code: " + code);
 
@@ -68,7 +76,29 @@ public class MainActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_about) {
+
+            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+            alertDialog.setTitle("Developed at The Hyve");
+
+            final TextView message = new TextView(this);
+            message.setMovementMethod(LinkMovementMethod.getInstance());
+
+            SpannableString s = new SpannableString("We provide open source solutions for bioinformatics. " +
+                    "Find us at http://thehyve.nl\n\n" +
+                    "Contribute at https://github.com/wardweistra/tranSMARTClient");
+            Linkify.addLinks(s, Linkify.WEB_URLS);
+            message.setText(s);
+            alertDialog.setView(message,30,30,30,30);
+
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+            // Set the Icon for the Dialog
+            alertDialog.setIcon(R.drawable.thehyve);
+            alertDialog.show();
+
             return true;
         }
 
@@ -81,6 +111,12 @@ public class MainActivity extends Activity {
 
         EditText serverUrlEditText = (EditText) findViewById(R.id.serverUrl);
         String serverUrl = serverUrlEditText.getText().toString();
+
+        if (serverUrl.equals("")) {
+            Toast toast = Toast.makeText(this, "Please specify your server URL", Toast.LENGTH_SHORT);
+            toast.show();
+            return;
+        }
 
         String query = serverUrl + "/oauth/authorize?"
                 + "response_type=code"
@@ -118,20 +154,33 @@ public class MainActivity extends Activity {
 
             String responseLine;
             StringBuilder responseBuilder = new StringBuilder();
+            String result = "";
             try {
                 HttpResponse response = httpClient.execute(httpGet);
                 Log.i(TAG,"Statusline : " + response.getStatusLine());
+
                 InputStream data = response.getEntity().getContent();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
 
                 while ((responseLine = bufferedReader.readLine()) != null) {
                     responseBuilder.append(responseLine);
                 }
-                Log.i(TAG,"Response : " + responseBuilder.toString());
+                result = responseBuilder.toString();
+                Log.i(TAG,"Response : " + result);
+
+                JSONObject jObject = new JSONObject(result);
+                String access_token = jObject.getString("access_token");
+                String refresh_token = jObject.getString("refresh_token");
+                Log.i(TAG,"access_token : " + access_token);
+                Log.i(TAG,"refresh_token : " + refresh_token);
+
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            return responseBuilder.toString();
+
+            return result;
         }
     }
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="AppTheme" parent="android:Theme.Material.Light">
+        <item name="android:colorPrimary">@color/transmartBlue</item>
+        <item name="android:colorPrimaryDark">@color/darkTransmartBlue</item>
     </style>
 </resources>

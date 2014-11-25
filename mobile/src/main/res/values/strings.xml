@@ -8,5 +8,7 @@
     <string name="serverUrl">http://myserver.com/transmart</string>
     <string name="button_submit">Connect</string>
     <string name="action_about">About</string>
+    <string name="studies">Studies</string>
+    <string name="addnewserver">Add a new server</string>
 
 </resources>

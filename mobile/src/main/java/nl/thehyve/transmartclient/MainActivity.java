@@ -2,6 +2,8 @@ package nl.thehyve.transmartclient;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -11,9 +13,11 @@ import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +37,7 @@ public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
 
+    public static String SERVER_URL = "http://75.124.74.46:5880/transmart";
     public static String OAUTH_ACCESS_TOKEN_URL = "http://75.124.74.46:5880/transmart/oauth/token";
 
     public static String CLIENT_ID = "api-client";
@@ -58,6 +63,12 @@ public class MainActivity extends Activity {
 
             new TokenGetterTask().execute(code);
         }
+
+        // TODO Check for whether there are already servers defined
+        Fragment fragment = new AddNewServerFragment();
+
+        FragmentManager fragmentManager = getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
     }
 
 
@@ -168,19 +179,106 @@ public class MainActivity extends Activity {
                 result = responseBuilder.toString();
                 Log.i(TAG,"Response : " + result);
 
-                JSONObject jObject = new JSONObject(result);
-                String access_token = jObject.getString("access_token");
-                String refresh_token = jObject.getString("refresh_token");
-                Log.i(TAG,"access_token : " + access_token);
-                Log.i(TAG,"refresh_token : " + refresh_token);
-
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
             return result;
         }
+
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+//            TODO Save details of server if connection was successful
+//            TODO Create new ServerOverview
+//            TODO In there: Start new AsyncTask to get studies from server
+            Fragment fragment = new ServerOverviewFragment();
+
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+            new StudiesGetter().execute(result);
+
+        }
+
     }
+
+    private class StudiesGetter extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            String result = String.valueOf(params[0]);
+
+            String access_token = "";
+
+            try {
+                JSONObject jObject = new JSONObject(result);
+                access_token = jObject.getString("access_token");
+                String refresh_token = jObject.getString("refresh_token");
+                Log.i(TAG,"access_token : " + access_token);
+                Log.i(TAG,"refresh_token : " + refresh_token);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            String query = SERVER_URL + "/"
+                    + "studies"
+                    ;
+
+            Log.v(TAG, "Sending query: [" + query + "].");
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+
+            HttpGet httpGet = new HttpGet(query);
+            httpGet.addHeader("Authorization","Bearer " + access_token);
+
+            String responseLine;
+            StringBuilder responseBuilder = new StringBuilder();
+            String queryResult = "";
+            try {
+                HttpResponse response = httpClient.execute(httpGet);
+                Log.i(TAG,"Statusline : " + response.getStatusLine());
+
+                InputStream data = response.getEntity().getContent();
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
+
+                while ((responseLine = bufferedReader.readLine()) != null) {
+                    responseBuilder.append(responseLine);
+                }
+                queryResult = responseBuilder.toString();
+                Log.i(TAG,"Response : " + queryResult);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return queryResult;
+        }
+    }
+
+    public static class ServerOverviewFragment extends Fragment {
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_serveroverview, container, false);
+
+            getActivity().setTitle(R.string.studies);
+            return rootView;
+        }
+    }
+
+    public static class AddNewServerFragment extends Fragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_addnewserver, container, false);
+
+            getActivity().setTitle(R.string.addnewserver);
+            return rootView;
+        }
+    }
+
+
 }

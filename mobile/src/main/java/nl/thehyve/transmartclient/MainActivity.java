@@ -6,6 +6,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,13 +19,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,26 +36,35 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
 
-    public static String SERVER_URL = "http://75.124.74.46:5880/transmart";
-    public static String OAUTH_ACCESS_TOKEN_URL = "http://75.124.74.46:5880/transmart/oauth/token";
-
     public static String CLIENT_ID = "api-client";
     public static String CLIENT_SECRET = "api-client";
+    TransmartServer transmartServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG,"onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (transmartServer == null){
+            Log.d(TAG,"transmartServer wasn't set. Setting it now.");
+            transmartServer = new TransmartServer();
+            SharedPreferences settings = getPreferences(MODE_PRIVATE);
+            String currentServerUrl = settings.getString("currentServerUrl", "");
+            Log.d(TAG,"Retrieved currentServerUrl from settings: "+currentServerUrl);
+            transmartServer.setServerUrl(currentServerUrl);
+        } else {
+            Log.d(TAG,"transmartServer is already set");
+        }
+
         Intent intent = getIntent();
-
         Uri uri = intent.getData();
-
         if (uri != null && uri.toString()
                 .startsWith("transmart://oauthresponse"))
         {
@@ -71,6 +84,21 @@ public class MainActivity extends Activity {
         fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
     }
 
+    @Override
+    protected void onStop() {
+        Log.d(TAG,"onStop called");
+        // We need an Editor object to make preference changes.
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        String currentServerUrl = transmartServer.getServerUrl();
+        editor.putString("currentServerUrl", currentServerUrl);
+        Log.d(TAG,"Saved currentServerUrl in to settings: "+currentServerUrl);
+
+        // Commit the edits!
+        editor.apply();
+
+        super.onStop();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -129,6 +157,8 @@ public class MainActivity extends Activity {
             return;
         }
 
+        transmartServer.setServerUrl(serverUrl);
+
         String query = serverUrl + "/oauth/authorize?"
                 + "response_type=code"
                 + "&client_id=" + CLIENT_ID
@@ -141,6 +171,32 @@ public class MainActivity extends Activity {
         startActivity(intent);
     }
 
+    public class TransmartServer {
+        String serverUrl;
+        String access_token;
+        String refresh_token;
+        String prettyName;
+
+        public TransmartServer() {
+            this.serverUrl = "";
+            this.access_token = "";
+            this.refresh_token = "";
+            this.prettyName = "";
+            Log.d(TAG,"transmartServer has been instantiated.");
+        }
+
+        public void setServerUrl(String serverUrl) {
+            this.serverUrl = serverUrl;
+            Log.d(TAG,"Set serverUrl to " + serverUrl);
+        }
+
+        public String getServerUrl() {
+            Log.d(TAG,"Asked for serverUrl: " + serverUrl);
+            return serverUrl;
+        }
+
+    }
+
     private class TokenGetterTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -148,7 +204,11 @@ public class MainActivity extends Activity {
 
             String code = String.valueOf(params[0]);
 
-            String query = OAUTH_ACCESS_TOKEN_URL + "?"
+            Log.d(TAG,"Getting serverUrl");
+            String serverUrl = transmartServer.getServerUrl();
+            Log.d(TAG,"serverUrl: " + serverUrl);
+
+            String query = serverUrl + "/oauth/token?"
                     + "grant_type=authorization_code"
                     + "&client_id=" + CLIENT_ID
                     + "&client_secret=" + CLIENT_SECRET
@@ -209,6 +269,9 @@ public class MainActivity extends Activity {
         protected String doInBackground(String... params) {
 
             String result = String.valueOf(params[0]);
+            Log.d(TAG,"Setting serverUrl");
+            String serverUrl = transmartServer.getServerUrl();
+            Log.d(TAG,"serverUrl: " + serverUrl);
 
             String access_token = "";
 
@@ -222,7 +285,7 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
 
-            String query = SERVER_URL + "/"
+            String query = serverUrl + "/"
                     + "studies"
                     ;
 
@@ -253,7 +316,41 @@ public class MainActivity extends Activity {
                 e.printStackTrace();
             }
 
+            // TODO cache list of studies
+            // Display list of studies in ListView
+
+
+
             return queryResult;
+        }
+
+        @Override
+        protected void onPostExecute(String queryResult) {
+            super.onPostExecute(queryResult);
+
+            try {
+                JSONArray jArray = new JSONArray(queryResult);
+                Log.i(TAG,jArray.toString());
+
+
+                final ArrayList<String> studyList = new ArrayList<String>();
+                for(int i = 0; i < jArray.length(); i++){
+                    JSONObject study = jArray.getJSONObject(i);
+                    String studyId = study.getString("id");
+                    Log.i(TAG,"Study: "+studyId);
+                    studyList.add(studyId);
+                }
+
+                ListView studyListView = (ListView) findViewById(R.id.studyList);
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
+                        R.layout.study_item, R.id.studyName, studyList);
+                studyListView.setAdapter(adapter);
+
+            } catch (JSONException e) {
+                Log.i(TAG,"Couldn't parse to JSON: " + queryResult);
+                e.printStackTrace();
+            }
+
         }
     }
 

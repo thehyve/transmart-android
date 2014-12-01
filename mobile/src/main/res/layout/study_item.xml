@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dip" >
+
+    <TextView
+        android:id="@+id/studyName"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:ellipsize="marquee"
+        android:singleLine="true"
+        android:text="Study Name"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"/>
+
+</RelativeLayout>

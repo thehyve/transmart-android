@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ListView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/studyList"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-</ListView>
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/fragment_serverOverview">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/studyOverviewIntro"
+        android:id="@+id/studyOverviewIntro"
+        android:textColor="@android:color/black"
+        android:paddingBottom="20dp" />
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/studyList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    </ListView>
+</LinearLayout>

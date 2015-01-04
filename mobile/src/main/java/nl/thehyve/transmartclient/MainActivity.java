@@ -7,28 +7,26 @@ import android.app.FragmentManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -36,7 +34,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends Activity {
 
@@ -44,60 +43,114 @@ public class MainActivity extends Activity {
 
     public static String CLIENT_ID = "api-client";
     public static String CLIENT_SECRET = "api-client";
-    TransmartServer transmartServer;
+
+    public static TransmartServer transmartServer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG,"onCreate called");
+        Log.d(TAG,"--> onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (transmartServer == null){
-            Log.d(TAG,"transmartServer wasn't set. Setting it now.");
+
+//        When the activity is started from the OAuth return URL: Get the code out
+        Intent intent = getIntent();
+        Uri uri = intent.getData();
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        boolean oauthCodeUsed = settings.getBoolean("oauthCodeUsed", false);
+        if (
+                uri != null
+                && uri.toString().startsWith("transmart://oauthresponse")
+                && !oauthCodeUsed
+                )
+        {
+            Log.d(TAG,"Received uri");
+            String code = uri.getQueryParameter("code");
+            Log.d(TAG,"Received OAuth code: " + code);
+
             transmartServer = new TransmartServer();
-            SharedPreferences settings = getPreferences(MODE_PRIVATE);
             String currentServerUrl = settings.getString("currentServerUrl", "");
             Log.d(TAG,"Retrieved currentServerUrl from settings: "+currentServerUrl);
             transmartServer.setServerUrl(currentServerUrl);
-        } else {
-            Log.d(TAG,"transmartServer is already set");
-        }
 
-        Intent intent = getIntent();
-        Uri uri = intent.getData();
-        if (uri != null && uri.toString()
-                .startsWith("transmart://oauthresponse"))
-        {
-            Log.d("TranSMART","Received uri");
-            String code = uri.getQueryParameter("code");
-            Toast toast = Toast.makeText(this, "Received OAuth code: " + code, Toast.LENGTH_SHORT);
-            toast.show();
-            Log.d("TranSMART","Received OAuth code: " + code);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("oauthCodeUsed", true);
+            editor.apply();
 
             new TokenGetterTask().execute(code);
         }
 
-        // TODO Check for whether there are already servers defined
-        Fragment fragment = new AddNewServerFragment();
+        if (savedInstanceState != null) {
+            transmartServer = savedInstanceState.getParcelable("transmartServer");
+            if (transmartServer != null) {
+                Log.d(TAG, "ServerURL from parcel: " + transmartServer.getServerUrl());
+            } else {
+                Log.d(TAG, "No transmartServer in parcel.");
+            }
+        } else {
+            Log.d(TAG, "savedInstanceState is null");
 
-        FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+//            Go to the add new server page
+            Fragment fragment = new AddNewServerFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+        }
     }
 
     @Override
     protected void onStop() {
-        Log.d(TAG,"onStop called");
-        // We need an Editor object to make preference changes.
-        SharedPreferences settings = getPreferences(MODE_PRIVATE);
-        SharedPreferences.Editor editor = settings.edit();
-        String currentServerUrl = transmartServer.getServerUrl();
-        editor.putString("currentServerUrl", currentServerUrl);
-        Log.d(TAG,"Saved currentServerUrl in to settings: "+currentServerUrl);
-
-        // Commit the edits!
-        editor.apply();
-
+        Log.d(TAG,"--> onStop called");
         super.onStop();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        Log.d(TAG,"--> onSaveInstanceState called");
+        // Always call the superclass so it can save the view hierarchy state
+        savedInstanceState.putParcelable("transmartServer",transmartServer);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        Log.d(TAG, "--> onRestoreInstanceState called");
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "--> onStart called");
+        super.onStart();
+    }
+
+    @Override
+    protected void onRestart() {
+        Log.d(TAG, "--> onRestart called");
+        super.onRestart();
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "--> onResume called");
+        super.onResume();
+
+        if (transmartServer == null){
+            Log.d(TAG,"transmartServer is not set.");
+        } else {
+            Log.d(TAG,"transmartServer is already set");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        Log.d(TAG, "--> onPause called");
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        Log.d(TAG, "--> onDestroy called");
+        super.onDestroy();
     }
 
     @Override
@@ -120,12 +173,26 @@ public class MainActivity extends Activity {
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();
             alertDialog.setTitle("Developed at The Hyve");
 
+            PackageInfo pInfo = null;
+            try {
+                pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
+            assert pInfo != null;
+            String versionName = pInfo.versionName;
+            int versionCode = pInfo.versionCode;
+
             final TextView message = new TextView(this);
             message.setMovementMethod(LinkMovementMethod.getInstance());
 
-            SpannableString s = new SpannableString("We provide open source solutions for bioinformatics. " +
-                    "Find us at http://thehyve.nl\n\n" +
-                    "Contribute at https://github.com/wardweistra/tranSMARTClient");
+            SpannableString s = new SpannableString(
+                    "Version "+versionName+" (version code "+versionCode+")\n" +
+                    "\n" +
+                    "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
+                    "\n" +
+                    "Contribute at https://github.com/wardweistra/tranSMARTClient"
+                    );
             Linkify.addLinks(s, Linkify.WEB_URLS);
             message.setText(s);
             alertDialog.setView(message,30,30,30,30);
@@ -139,6 +206,10 @@ public class MainActivity extends Activity {
             alertDialog.show();
 
             return true;
+        } else if (id == R.id.action_addNewServer) {
+            Fragment fragment = new AddNewServerFragment();
+            FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
 
         return super.onOptionsItemSelected(item);
@@ -148,7 +219,7 @@ public class MainActivity extends Activity {
 
     public void connectToTranSMARTServer(View view) {
 
-        EditText serverUrlEditText = (EditText) findViewById(R.id.serverUrl);
+        EditText serverUrlEditText = (EditText) findViewById(R.id.serverUrlField);
         String serverUrl = serverUrlEditText.getText().toString();
 
         if (serverUrl.equals("")) {
@@ -157,7 +228,14 @@ public class MainActivity extends Activity {
             return;
         }
 
-        transmartServer.setServerUrl(serverUrl);
+        try {
+//            TODO check if we can use Uri.parse for the same check, to reduce number of libraries
+            new URL(serverUrl);
+        } catch (MalformedURLException e) {
+            Toast toast = Toast.makeText(this, "Please specify the URL of your tranSMART server, starting with http:// or https://", Toast.LENGTH_SHORT);
+            toast.show();
+            return;
+        }
 
         String query = serverUrl + "/oauth/authorize?"
                 + "response_type=code"
@@ -166,47 +244,31 @@ public class MainActivity extends Activity {
                 + "&redirect_uri=" + "transmart://oauthresponse"
                 ;
 
+        // We need an Editor object to make preference changes.
+        SharedPreferences settings = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("currentServerUrl", serverUrl);
+        editor.putBoolean("oauthCodeUsed", false);
+        Log.d(TAG,"Saved currentServerUrl in to settings: "+serverUrl);
+
+        // Commit the edits!
+        editor.apply();
+
         Intent intent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse(query));
         startActivity(intent);
     }
 
-    public class TransmartServer {
-        String serverUrl;
-        String access_token;
-        String refresh_token;
-        String prettyName;
-
-        public TransmartServer() {
-            this.serverUrl = "";
-            this.access_token = "";
-            this.refresh_token = "";
-            this.prettyName = "";
-            Log.d(TAG,"transmartServer has been instantiated.");
-        }
-
-        public void setServerUrl(String serverUrl) {
-            this.serverUrl = serverUrl;
-            Log.d(TAG,"Set serverUrl to " + serverUrl);
-        }
-
-        public String getServerUrl() {
-            Log.d(TAG,"Asked for serverUrl: " + serverUrl);
-            return serverUrl;
-        }
-
-    }
-
-    private class TokenGetterTask extends AsyncTask<String, Void, String> {
+    private class TokenGetterTask extends AsyncTask<String, Void, ServerResult> {
 
         @Override
-        protected String doInBackground(String... params) {
+        protected ServerResult doInBackground(String... params) {
+
+            ServerResult serverResult = new ServerResult();
 
             String code = String.valueOf(params[0]);
 
-            Log.d(TAG,"Getting serverUrl");
             String serverUrl = transmartServer.getServerUrl();
-            Log.d(TAG,"serverUrl: " + serverUrl);
 
             String query = serverUrl + "/oauth/token?"
                     + "grant_type=authorization_code"
@@ -225,10 +287,18 @@ public class MainActivity extends Activity {
 
             String responseLine;
             StringBuilder responseBuilder = new StringBuilder();
-            String result = "";
+
             try {
                 HttpResponse response = httpClient.execute(httpGet);
                 Log.i(TAG,"Statusline : " + response.getStatusLine());
+                int statusCode = response.getStatusLine().getStatusCode();
+                String statusDescription = response.getStatusLine().getReasonPhrase();
+                serverResult.setResponseCode(statusCode);
+                serverResult.setResponseDescription(statusDescription);
+
+                if (statusCode != 200) {
+                    return serverResult;
+                }
 
                 InputStream data = response.getEntity().getContent();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
@@ -236,144 +306,45 @@ public class MainActivity extends Activity {
                 while ((responseLine = bufferedReader.readLine()) != null) {
                     responseBuilder.append(responseLine);
                 }
-                result = responseBuilder.toString();
+                String result = responseBuilder.toString();
+                serverResult.setResult(result);
                 Log.i(TAG,"Response : " + result);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            return result;
+            return serverResult;
         }
 
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
+        protected void onPostExecute(ServerResult serverResult) {
+            super.onPostExecute(serverResult);
 
-//            TODO Save details of server if connection was successful
-//            TODO Create new ServerOverview
-//            TODO In there: Start new AsyncTask to get studies from server
-            Fragment fragment = new ServerOverviewFragment();
+            if (serverResult.getResponseCode() == 200) {
+                Fragment fragment = new ServerOverviewFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                String access_token;
 
-            new StudiesGetter().execute(result);
-
-        }
-
-    }
-
-    private class StudiesGetter extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            String result = String.valueOf(params[0]);
-            Log.d(TAG,"Setting serverUrl");
-            String serverUrl = transmartServer.getServerUrl();
-            Log.d(TAG,"serverUrl: " + serverUrl);
-
-            String access_token = "";
-
-            try {
-                JSONObject jObject = new JSONObject(result);
-                access_token = jObject.getString("access_token");
-                String refresh_token = jObject.getString("refresh_token");
-                Log.i(TAG,"access_token : " + access_token);
-                Log.i(TAG,"refresh_token : " + refresh_token);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            String query = serverUrl + "/"
-                    + "studies"
-                    ;
-
-            Log.v(TAG, "Sending query: [" + query + "].");
-
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-
-            HttpGet httpGet = new HttpGet(query);
-            httpGet.addHeader("Authorization","Bearer " + access_token);
-
-            String responseLine;
-            StringBuilder responseBuilder = new StringBuilder();
-            String queryResult = "";
-            try {
-                HttpResponse response = httpClient.execute(httpGet);
-                Log.i(TAG,"Statusline : " + response.getStatusLine());
-
-                InputStream data = response.getEntity().getContent();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
-
-                while ((responseLine = bufferedReader.readLine()) != null) {
-                    responseBuilder.append(responseLine);
-                }
-                queryResult = responseBuilder.toString();
-                Log.i(TAG,"Response : " + queryResult);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            // TODO cache list of studies
-            // Display list of studies in ListView
-
-
-
-            return queryResult;
-        }
-
-        @Override
-        protected void onPostExecute(String queryResult) {
-            super.onPostExecute(queryResult);
-
-            try {
-                JSONArray jArray = new JSONArray(queryResult);
-                Log.i(TAG,jArray.toString());
-
-
-                final ArrayList<String> studyList = new ArrayList<String>();
-                for(int i = 0; i < jArray.length(); i++){
-                    JSONObject study = jArray.getJSONObject(i);
-                    String studyId = study.getString("id");
-                    Log.i(TAG,"Study: "+studyId);
-                    studyList.add(studyId);
+                try {
+                    JSONObject jObject = new JSONObject(serverResult.getResult());
+                    access_token = jObject.getString("access_token");
+                    transmartServer.setAccess_token(access_token);
+                    String refresh_token = jObject.getString("refresh_token");
+                    transmartServer.setRefresh_token(refresh_token);
+                    Log.i(TAG,"access_token : " + access_token);
+                    Log.i(TAG,"refresh_token : " + refresh_token);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
 
-                ListView studyListView = (ListView) findViewById(R.id.studyList);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),
-                        R.layout.study_item, R.id.studyName, studyList);
-                studyListView.setAdapter(adapter);
-
-            } catch (JSONException e) {
-                Log.i(TAG,"Couldn't parse to JSON: " + queryResult);
-                e.printStackTrace();
+            } else {
+                Toast toast = Toast.makeText(getBaseContext(), "Server responded with code "
+                        + serverResult.getResponseCode() +": "
+                        + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
+                toast.show();
             }
-
-        }
-    }
-
-    public static class ServerOverviewFragment extends Fragment {
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_serveroverview, container, false);
-
-            getActivity().setTitle(R.string.studies);
-            return rootView;
-        }
-    }
-
-    public static class AddNewServerFragment extends Fragment {
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_addnewserver, container, false);
-
-            getActivity().setTitle(R.string.addnewserver);
-            return rootView;
         }
     }
 

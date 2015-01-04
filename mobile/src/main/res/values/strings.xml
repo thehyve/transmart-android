@@ -2,13 +2,25 @@
 <resources>
 
     <string name="app_name">TranSMART Client</string>
-    <string name="welcomeText">Example server:</string>
+    <string name="welcomeText">Welcome, please add your tranSMART server from the menu to start.</string>
+
+    <!--Add new server-->
+    <string name="addServerText">Enter your tranSMART address below and give this application permission to access your data.</string>
+    <string name="addServerText2">Feel free to use this public example server, provided by the tranSMART Foundation, for testing purposes:</string>
     <string name="urlExample">http://75.124.74.46:5880/transmart</string>
-    <string name="loginExample">Login with admin/admin.</string>
+    <string name="loginExample">You can log in with username \'admin\' and password \'admin\'.</string>
     <string name="serverUrl">http://myserver.com/transmart</string>
     <string name="button_submit">Connect</string>
+
+    <!--Server overview-->
+    <string name="studyOverviewIntro">Below are the studies in this tranSMART server.</string>
+
+    <!--Menu items-->
+    <string name="action_addNewServer">New Server</string>
     <string name="action_about">About</string>
-    <string name="studies">Studies</string>
+
+    <!--Fragment titles-->
+    <string name="serverOverview">Server overview</string>
     <string name="addnewserver">Add a new server</string>
 
 </resources>

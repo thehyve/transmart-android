@@ -2,15 +2,50 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:id="@+id/fragment_addnewserver">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/welcomeText"
-            android:id="@+id/welcomeText"
+            android:text="@string/addServerText"
+            android:id="@+id/addServerText"
             android:textColor="@android:color/black" />
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/buttonContainer"
+        android:paddingTop="10dp"
+        android:paddingBottom="20dp">
+
+
+        <EditText android:id="@+id/serverUrlField"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="@string/serverUrl"
+            android:inputType="textUri"
+            />
+
+        <Button
+            android:id="@+id/connect_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="connectToTranSMARTServer"
+            android:text="@string/button_submit" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/addServerText2"
+        android:id="@+id/addServerText2"
+        android:textColor="@android:color/black" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -18,7 +53,9 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/urlExample"
             android:id="@+id/textView"
-            android:textIsSelectable="true" />
+            android:textIsSelectable="true"
+            android:padding="5dp"
+            android:textColor="@color/common_signin_btn_light_text_default" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,27 +65,6 @@
             android:id="@+id/loginExample"
             android:textColor="@android:color/black" />
 
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:id="@+id/buttonContainer">
 
-
-            <EditText android:id="@+id/serverUrl"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:hint="@string/serverUrl"
-                android:inputType="textUri"
-                />
-
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="connectToTranSMARTServer"
-                android:text="@string/button_submit" />
-
-        </LinearLayout>
 
 </LinearLayout>

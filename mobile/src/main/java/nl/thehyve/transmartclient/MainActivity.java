@@ -218,9 +218,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
     // This is the method that is called when the submit button is clicked
 
-    //TODO split this in two, so it can be reused by the reconnect function
-    public void connectToTranSMARTServer(View view) {
-
+    public void checkTransmartServerUrl(View view) {
         EditText serverUrlEditText = (EditText) findViewById(R.id.serverUrlField);
         String serverUrl = serverUrlEditText.getText().toString();
 
@@ -236,7 +234,6 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         }
 
         try {
-//            TODO check if we can use Uri.parse for the same check, to reduce number of libraries
             new URL(serverUrl);
         } catch (MalformedURLException e) {
             Toast toast = Toast.makeText(this, "Please specify the URL of your tranSMART server, starting with http:// or https://", Toast.LENGTH_SHORT);
@@ -248,6 +245,13 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
             serverUrl = serverUrl.substring(0,serverUrl.length()-1);
             Log.d(TAG,"Removed trailing /: "+serverUrl);
         }
+
+        connectToTranSMARTServer(serverUrl);
+    }
+
+    public void connectToTranSMARTServer(String serverUrl) {
+
+
 
         String query = serverUrl + "/oauth/authorize?"
                 + "response_type=code"
@@ -267,7 +271,6 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         editor.apply();
 
         Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(query));
-        Toast.makeText(this, "Sending you to "+serverUrl+" for data access permission", Toast.LENGTH_SHORT).show();
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
@@ -283,17 +286,14 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         alertDialog.setTitle("Authorization lost");
         final TextView message = new TextView(this);
         SpannableString s = new SpannableString(
-                "The tranSMART server seems to have forgotten that you have given this app permission" +
+                "The tranSMART server seems to have forgotten that you have given this app permission " +
                         "to access your data. Shall we try to reconnect?"
         );
         message.setText(s);
         alertDialog.setView(message, 30, 30, 30, 30);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Reconnect", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                Fragment fragment = new AddNewServerFragment();
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-                //TODO Fill in known tranSMART server URL or start directly with reconnecting.
+                connectToTranSMARTServer(transmartServer.getServerUrl());
             }
         });
         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Try again", new DialogInterface.OnClickListener() {

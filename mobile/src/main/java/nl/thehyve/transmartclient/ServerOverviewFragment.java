@@ -1,5 +1,6 @@
 package nl.thehyve.transmartclient;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,8 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
  */
 public class ServerOverviewFragment extends Fragment {
     private static final String TAG = "ServerOverviewFragment";
+    private OnFragmentInteractionListener mListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,11 +50,34 @@ public class ServerOverviewFragment extends Fragment {
         return rootView;
     }
 
-    // TODO return
-    private class StudiesGetter extends AsyncTask<Void, Void, String> {
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        public void authorizationLost();
+    }
+
+    private class StudiesGetter extends AsyncTask<Void, Void, ServerResult> {
 
         @Override
-        protected String doInBackground(Void... params) {
+        protected ServerResult doInBackground(Void... params) {
+
+            ServerResult serverResult = new ServerResult();
 
             String serverUrl = MainActivity.transmartServer.getServerUrl();
             String access_token = MainActivity.transmartServer.getAccess_token();
@@ -68,10 +95,20 @@ public class ServerOverviewFragment extends Fragment {
 
             String responseLine;
             StringBuilder responseBuilder = new StringBuilder();
-            String queryResult = "";
+            String queryResult;
             try {
                 HttpResponse response = httpClient.execute(httpGet);
-                Log.i(TAG,"Statusline : " + response.getStatusLine());
+
+                StatusLine statusLine = response.getStatusLine();
+                Log.i(TAG,"Statusline : " + statusLine);
+                int statusCode = statusLine.getStatusCode();
+                String statusDescription = statusLine.getReasonPhrase();
+                serverResult.setResponseCode(statusCode);
+                serverResult.setResponseDescription(statusDescription);
+
+                if (statusCode != 200) {
+                    return serverResult;
+                }
 
                 InputStream data = response.getEntity().getContent();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
@@ -80,6 +117,7 @@ public class ServerOverviewFragment extends Fragment {
                     responseBuilder.append(responseLine);
                 }
                 queryResult = responseBuilder.toString();
+                serverResult.setResult(queryResult);
                 Log.i(TAG,"Response : " + queryResult);
 
             } catch (IOException e) {
@@ -91,36 +129,46 @@ public class ServerOverviewFragment extends Fragment {
 
 
 
-            return queryResult;
+            return serverResult;
         }
 
         @Override
-        protected void onPostExecute(String queryResult) {
-            super.onPostExecute(queryResult);
+        protected void onPostExecute(ServerResult serverResult) {
+            super.onPostExecute(serverResult);
 
-            try {
-                JSONArray jArray = new JSONArray(queryResult);
-                Log.i(TAG,jArray.toString());
+            if (serverResult.getResponseCode() == 200) {
+                try {
+                    JSONArray jArray = new JSONArray(serverResult.getResult());
+                    Log.i(TAG, jArray.toString());
 
 
-                final ArrayList<String> studyList = new ArrayList<String>();
-                for(int i = 0; i < jArray.length(); i++){
-                    JSONObject study = jArray.getJSONObject(i);
-                    String studyId = study.getString("id");
-                    Log.i(TAG,"Study: "+studyId);
-                    studyList.add(studyId);
+                    final ArrayList<String> studyList = new ArrayList<String>();
+                    for (int i = 0; i < jArray.length(); i++) {
+                        JSONObject study = jArray.getJSONObject(i);
+                        String studyId = study.getString("id");
+                        Log.i(TAG, "Study: " + studyId);
+                        studyList.add(studyId);
+                    }
+
+                    ListView studyListView = (ListView) getView().findViewById(R.id.studyList);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
+                            R.layout.study_item, R.id.studyName, studyList);
+                    studyListView.setAdapter(adapter);
+
+                } catch (JSONException e) {
+                    Log.i(TAG, "Couldn't parse to JSON: " + serverResult.getResult());
+                    e.printStackTrace();
                 }
-
-                ListView studyListView = (ListView) getView().findViewById(R.id.studyList);
-                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
-                        R.layout.study_item, R.id.studyName, studyList);
-                studyListView.setAdapter(adapter);
-
-            } catch (JSONException e) {
-                Log.i(TAG,"Couldn't parse to JSON: " + queryResult);
-                e.printStackTrace();
+            } else if (serverResult.getResponseCode() == 401) {
+                if (mListener != null) {
+                    mListener.authorizationLost();
+                }
+            } else {
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Server responded with code "
+                        + serverResult.getResponseCode() + ": "
+                        + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
+                toast.show();
             }
-
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
@@ -37,7 +39,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements ServerOverviewFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
 
@@ -196,11 +198,10 @@ public class MainActivity extends Activity {
             Linkify.addLinks(s, Linkify.WEB_URLS);
             message.setText(s);
             alertDialog.setView(message,30,30,30,30);
-
-                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
+            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                }
+            });
             // Set the Icon for the Dialog
             alertDialog.setIcon(R.drawable.thehyve);
             alertDialog.show();
@@ -217,15 +218,21 @@ public class MainActivity extends Activity {
 
     // This is the method that is called when the submit button is clicked
 
+    //TODO split this in two, so it can be reused by the reconnect function
     public void connectToTranSMARTServer(View view) {
 
         EditText serverUrlEditText = (EditText) findViewById(R.id.serverUrlField);
         String serverUrl = serverUrlEditText.getText().toString();
 
         if (serverUrl.equals("")) {
-            Toast toast = Toast.makeText(this, "Please specify your server URL", Toast.LENGTH_SHORT);
-            toast.show();
+            Toast.makeText(this, "Please specify your server URL", Toast.LENGTH_SHORT).show();
             return;
+        }
+
+        Log.d(TAG,"Scheme: "+Uri.parse(serverUrl).getScheme());
+        if (Uri.parse(serverUrl).getScheme()==null){
+            serverUrl = "https://" + serverUrl;
+
         }
 
         try {
@@ -235,6 +242,11 @@ public class MainActivity extends Activity {
             Toast toast = Toast.makeText(this, "Please specify the URL of your tranSMART server, starting with http:// or https://", Toast.LENGTH_SHORT);
             toast.show();
             return;
+        }
+
+        if (serverUrl.substring(serverUrl.length()-1).equals("/")) {
+            serverUrl = serverUrl.substring(0,serverUrl.length()-1);
+            Log.d(TAG,"Removed trailing /: "+serverUrl);
         }
 
         String query = serverUrl + "/oauth/authorize?"
@@ -254,9 +266,44 @@ public class MainActivity extends Activity {
         // Commit the edits!
         editor.apply();
 
-        Intent intent = new Intent(Intent.ACTION_VIEW,
-                Uri.parse(query));
-        startActivity(intent);
+        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(query));
+        Toast.makeText(this, "Sending you to "+serverUrl+" for data access permission", Toast.LENGTH_SHORT).show();
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast toast = Toast.makeText(this, "There is no app installed to open the URL "+serverUrl, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
+    }
+
+    @Override
+    public void authorizationLost() {
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle("Authorization lost");
+        final TextView message = new TextView(this);
+        SpannableString s = new SpannableString(
+                "The tranSMART server seems to have forgotten that you have given this app permission" +
+                        "to access your data. Shall we try to reconnect?"
+        );
+        message.setText(s);
+        alertDialog.setView(message, 30, 30, 30, 30);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Reconnect", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Fragment fragment = new AddNewServerFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                //TODO Fill in known tranSMART server URL or start directly with reconnecting.
+            }
+        });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Try again", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Fragment fragment = new ServerOverviewFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
+        });
+        alertDialog.show();
     }
 
     private class TokenGetterTask extends AsyncTask<String, Void, ServerResult> {
@@ -290,9 +337,10 @@ public class MainActivity extends Activity {
 
             try {
                 HttpResponse response = httpClient.execute(httpGet);
-                Log.i(TAG,"Statusline : " + response.getStatusLine());
-                int statusCode = response.getStatusLine().getStatusCode();
-                String statusDescription = response.getStatusLine().getReasonPhrase();
+                StatusLine statusLine = response.getStatusLine();
+                Log.i(TAG,"Statusline : " + statusLine);
+                int statusCode = statusLine.getStatusCode();
+                String statusDescription = statusLine.getReasonPhrase();
                 serverResult.setResponseCode(statusCode);
                 serverResult.setResponseDescription(statusDescription);
 
@@ -325,6 +373,7 @@ public class MainActivity extends Activity {
                 FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
+                //TODO check if next block does not need to be above fragment call or be removed
                 String access_token;
 
                 try {

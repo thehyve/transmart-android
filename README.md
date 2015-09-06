@@ -15,8 +15,8 @@ Please note that you need to have the transmart-rest-api plugin installed on you
   ]
   ```
 
-The application is available on Google Play, but currently in Alpha testing. Request access to this Google Group to join the testing fun: https://plus.google.com/communities/115656267034434322568
+The application is available on Google Play, but currently in Alpha testing. Request access to this Google Group to join the testing fun: https://plus.google.com/communities/115656267034434322568.
 
 [![Get it on Google Play](https://developer.android.com/images/brand/en_generic_rgb_wo_45.png)](https://play.google.com/store/apps/details?id=nl.thehyve.transmartclient)
 
-The tranSMARTClient is currently being developed in The Hyve. Find us at http://thehyve.nl
+The tranSMARTClient is currently being developed in The Hyve. Find us at http://thehyve.nl.

@@ -72,8 +72,8 @@ public class ServerOverviewFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         public void authorizationLost();
+        public void connectionLost();
     }
 
     private class StudiesGetter extends AsyncTask<Void, Void, ServerResult> {
@@ -166,6 +166,10 @@ public class ServerOverviewFragment extends Fragment {
             } else if (serverResult.getResponseCode() == 401) {
                 if (mListener != null) {
                     mListener.authorizationLost();
+                }
+            } else if (serverResult.getResponseCode() == 0) {
+                if (mListener != null) {
+                    mListener.connectionLost();
                 }
             } else {
                 Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Server responded with code "

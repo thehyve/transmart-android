@@ -316,6 +316,30 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         alertDialog.show();
     }
 
+    @Override
+    public void connectionLost() {
+        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle("Connection lost");
+        final TextView message = new TextView(this);
+        SpannableString s = new SpannableString(
+                "We seem to be unable to reach the tranSMART server. Please check your internet " +
+                        "connection and try again."
+        );
+        message.setText(s);
+        alertDialog.setView(message, 30, 30, 30, 30);
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Try again", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                Fragment fragment = new ServerOverviewFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
+        });
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+        alertDialog.show();
+    }
     private class TokenGetterTask extends AsyncTask<String, Void, ServerResult> {
 
         @Override

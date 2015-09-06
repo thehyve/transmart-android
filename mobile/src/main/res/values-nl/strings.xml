@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TranSMART Client</string>
+    <string name="action_about">Over</string>
+    <string name="action_addNewServer">Nieuwe Server</string>
+    <string name="addServerText">Vul hieronder je tranSMART adres in en geef deze applicatie toestemming om bij jouw data te mogen.</string>
+    <string name="addServerText2">Om te testen kan je de onderstaande voorbeeld-server gebruiken:</string>
+    <string name="addnewserver">Voeg een nieuwe server toe</string>
+    <string name="button_submit">Verbinden</string>
+    <string name="loginExample">Log in met gebruikersnaam \'user\' en wachtwoord \'user\'. </string>
+    <string name="serverOverview">Server overzicht</string>
+    <string name="studyOverviewIntro">Dit zijn de studies in deze tranSMART server.</string>
+    <string name="welcomeText">Welkom, voeg om te beginnen jouw tranSMART server toe via het menu.</string>
+</resources>

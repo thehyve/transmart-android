@@ -73,6 +73,9 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
                 && !oauthCodeUsed
                 )
         {
+//            TODO Show waiting sign: "Connecting to the tranSMART server"
+
+            // Keep in mind that a new instance of the same application has been started
             Log.d(TAG,"Received uri");
             String code = uri.getQueryParameter("code");
             Log.d(TAG,"Received OAuth code: " + code);
@@ -276,6 +279,8 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         editor.putBoolean("oauthCodeUsed", false);
         Log.d(TAG,"Saved currentServerUrl in to settings: "+serverUrl);
 
+        Log.d(TAG,"Opening URL: "+query);
+
         // Commit the edits!
         editor.apply();
 
@@ -288,6 +293,8 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         }
 
     }
+
+    // Methods for ServerOverviewFragment
 
     @Override
     public void authorizationLost() {
@@ -339,6 +346,12 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         });
         alertDialog.show();
     }
+
+//    TODO create class that does Async call to tranSMART server
+//    Input: type of query, code
+//    Does: query, handling status codes, decoding JSON
+//    Output: JSON
+
     private class TokenGetterTask extends AsyncTask<String, Void, ServerResult> {
 
         @Override

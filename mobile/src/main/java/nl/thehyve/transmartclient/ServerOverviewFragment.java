@@ -136,11 +136,6 @@ public class ServerOverviewFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            // TODO cache list of studies
-            // Display list of studies in ListView
-
-
-
             return serverResult;
         }
 

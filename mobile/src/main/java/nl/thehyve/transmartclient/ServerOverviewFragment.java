@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /**
@@ -127,6 +128,10 @@ public class ServerOverviewFragment extends Fragment {
                 serverResult.setResult(queryResult);
                 Log.i(TAG,"Response : " + queryResult);
 
+            } catch (UnknownHostException e){
+                serverResult.setResponseCode(0);
+                serverResult.setResponseDescription("Make sure that your internet connection " +
+                        "is still working.");
             } catch (IOException e) {
                 e.printStackTrace();
             }

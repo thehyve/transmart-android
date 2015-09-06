@@ -50,8 +50,8 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
     private static final String TAG = "MainActivity";
 
-    public static String CLIENT_ID = "api-client";
-    public static String CLIENT_SECRET = "api-client";
+    public static String CLIENT_ID = "android-client";
+    public static String CLIENT_SECRET = "";
 
     public static TransmartServer transmartServer;
 

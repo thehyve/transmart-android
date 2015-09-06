@@ -402,11 +402,6 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
             super.onPostExecute(serverResult);
 
             if (serverResult.getResponseCode() == 200) {
-                Fragment fragment = new ServerOverviewFragment();
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-                //TODO check if next block does not need to be above fragment call or be removed
                 String access_token;
 
                 try {
@@ -420,6 +415,11 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+//                Display ServerOverview Fragment
+                Fragment fragment = new ServerOverviewFragment();
+                FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
 
             } else {
                 Toast toast = Toast.makeText(getBaseContext(), "Server responded with code "

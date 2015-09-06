@@ -7,8 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by wardweistra on 01-12-14.
+ * Created by Ward Weistra on 01-12-14.
+ * Copyright (c) 2014 The Hyve B.V.
+ * This code is licensed under the GNU Lesser General Public License,
+ * version 3, or (at your option) any later version.
  */
+
 public class AddNewServerFragment extends Fragment {
     private static final String TAG = "AddNewServerFragment";
 

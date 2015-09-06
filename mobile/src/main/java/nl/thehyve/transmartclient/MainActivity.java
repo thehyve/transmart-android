@@ -39,6 +39,13 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+/**
+ * Created by Ward Weistra.
+ * Copyright (c) 2014 The Hyve B.V.
+ * This code is licensed under the GNU Lesser General Public License,
+ * version 3, or (at your option) any later version.
+ */
+
 public class MainActivity extends Activity implements ServerOverviewFragment.OnFragmentInteractionListener {
 
     private static final String TAG = "MainActivity";
@@ -190,10 +197,13 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
             SpannableString s = new SpannableString(
                     "Version "+versionName+" (version code "+versionCode+")\n" +
-                    "\n" +
-                    "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
-                    "\n" +
-                    "Contribute at https://github.com/wardweistra/tranSMARTClient"
+                            "\n" +
+                            "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
+                            "\n" +
+                            "This code is licensed under the GNU Lesser General Public License, " +
+                            "version 3, or (at your option) any later version.\n" +
+                            "\n" +
+                            "Contribute at https://github.com/wardweistra/tranSMARTClient"
                     );
             Linkify.addLinks(s, Linkify.WEB_URLS);
             message.setText(s);

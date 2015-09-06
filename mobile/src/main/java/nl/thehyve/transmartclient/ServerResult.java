@@ -1,8 +1,12 @@
 package nl.thehyve.transmartclient;
 
 /**
- * Created by Ward Weistra, The Hyve on 22-12-14.
+ * Created by Ward Weistra on 22-12-14.
+ * Copyright (c) 2014 The Hyve B.V.
+ * This code is licensed under the GNU Lesser General Public License,
+ * version 3, or (at your option) any later version.
  */
+
 public class ServerResult {
     private int responseCode;
     private String responseDescription;

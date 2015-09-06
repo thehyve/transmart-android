@@ -13,7 +13,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
@@ -114,7 +113,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         Log.d(TAG,"--> onSaveInstanceState called");
         // Always call the superclass so it can save the view hierarchy state
         savedInstanceState.putParcelable("transmartServer",transmartServer);
@@ -122,7 +121,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
     }
 
     @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
         Log.d(TAG, "--> onRestoreInstanceState called");
         super.onRestoreInstanceState(savedInstanceState);
     }
@@ -177,7 +176,6 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_about) {
 
             AlertDialog alertDialog = new AlertDialog.Builder(this).create();

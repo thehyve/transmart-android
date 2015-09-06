@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
@@ -362,7 +363,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
             Log.v(TAG, "Sending query: [" + query + "].");
 
-            DefaultHttpClient httpClient = new DefaultHttpClient();
+            HttpClient httpClient = new DefaultHttpClient();
 
             HttpGet httpGet = new HttpGet(query);
 

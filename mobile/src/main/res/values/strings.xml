@@ -6,10 +6,10 @@
 
     <!-- Add new server -->
     <string name="addServerText">Enter your tranSMART address below and give this application permission to access your data.</string>
-    <string name="addServerText2">Feel free to use this public example server, provided by the tranSMART Foundation, for testing purposes:</string>
-    <string name="urlExample">http://75.124.74.46:5880/transmart</string>
-    <string name="loginExample">You can log in with username \'admin\' and password \'admin\'.</string>
-    <string name="serverUrl">http://myserver.com/transmart</string>
+    <string name="addServerText2">Feel free to use this example server for testing purposes:</string>
+    <string name="urlExample" translatable="false">http://transmart-demo.thehyve.net/transmart</string>
+    <string name="loginExample">Log in with username \'user\' and password \'user\'.</string>
+    <string name="serverUrl" translatable="false">http://myserver.com/transmart</string>
     <string name="button_submit">Connect</string>
 
     <!-- Server overview -->

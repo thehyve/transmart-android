@@ -119,7 +119,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
     public void onSaveInstanceState(Bundle savedInstanceState) {
         Log.d(TAG,"--> onSaveInstanceState called");
         // Always call the superclass so it can save the view hierarchy state
-        savedInstanceState.putParcelable("transmartServer",transmartServer);
+        savedInstanceState.putParcelable("transmartServer", transmartServer);
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -239,7 +239,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
             return;
         }
 
-        Log.d(TAG,"Scheme: "+Uri.parse(serverUrl).getScheme());
+        Log.d(TAG, "Scheme: " + Uri.parse(serverUrl).getScheme());
         if (Uri.parse(serverUrl).getScheme()==null){
             serverUrl = "https://" + serverUrl;
 
@@ -277,9 +277,9 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("currentServerUrl", serverUrl);
         editor.putBoolean("oauthCodeUsed", false);
-        Log.d(TAG,"Saved currentServerUrl in to settings: "+serverUrl);
+        Log.d(TAG, "Saved currentServerUrl in to settings: " + serverUrl);
 
-        Log.d(TAG,"Opening URL: "+query);
+        Log.d(TAG, "Opening URL: " + query);
 
         // Commit the edits!
         editor.apply();

@@ -347,7 +347,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         alertDialog.show();
     }
 
-//    TODO create class that does Async call to tranSMART server
+//    TODO create Handler to handle calls to tranSMART server
 //    Input: type of query, code
 //    Does: query, handling status codes, decoding JSON
 //    Output: JSON
@@ -373,7 +373,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
 
             Log.v(TAG, "Sending query: [" + query + "].");
-
+// TODO Use httpUrlConnection instead of HttpClient. See NetworkingURL app as example.
             HttpClient httpClient = new DefaultHttpClient();
 
             HttpGet httpGet = new HttpGet(query);

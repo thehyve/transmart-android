@@ -41,7 +41,7 @@ import java.net.URL;
 
 /**
  * Created by Ward Weistra.
- * Copyright (c) 2014 The Hyve B.V.
+ * Copyright (c) 2015 The Hyve B.V.
  * This code is licensed under the GNU Lesser General Public License,
  * version 3, or (at your option) any later version.
  */

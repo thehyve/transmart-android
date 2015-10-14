@@ -7,12 +7,13 @@ import android.app.FragmentManager;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
@@ -21,21 +22,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -46,14 +37,17 @@ import java.net.URL;
  * version 3, or (at your option) any later version.
  */
 
-public class MainActivity extends Activity implements ServerOverviewFragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity implements ServerOverviewFragment.OnFragmentInteractionListener, TokenReceiver.TokenReceivedListener {
 
     private static final String TAG = "MainActivity";
+    private final IntentFilter intentFilter = new IntentFilter(TokenGetterTask.TOKEN_RECEIVED_INTENT);
+    private final TokenReceiver tokenReceiver = new TokenReceiver();
 
     public static String CLIENT_ID = "android-client";
     public static String CLIENT_SECRET = "";
 
     public static TransmartServer transmartServer;
+    private LocalBroadcastManager mBroadcastMgr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,15 +83,15 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
             editor.putBoolean("oauthCodeUsed", true);
             editor.apply();
 
-            new TokenGetterTask().execute(code);
+            new TokenGetterTask(this.getApplicationContext(), transmartServer, CLIENT_ID, CLIENT_SECRET).execute(code);
         }
 
         if (savedInstanceState != null) {
             transmartServer = savedInstanceState.getParcelable("transmartServer");
             if (transmartServer != null) {
-                Log.d(TAG, "ServerURL from parcel: " + transmartServer.getServerUrl());
+                Log.d(TAG, "savedInstanceState not null. ServerURL from parcel: " + transmartServer.getServerUrl());
             } else {
-                Log.d(TAG, "No transmartServer in parcel.");
+                Log.d(TAG, "savedInstanceState not null. No transmartServer in parcel.");
             }
         } else {
             Log.d(TAG, "savedInstanceState is null");
@@ -107,6 +101,12 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
+
+        mBroadcastMgr = LocalBroadcastManager
+                .getInstance(getApplicationContext());
+        tokenReceiver.setTokenReceivedListener(this);
+        mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
+
     }
 
     @Override
@@ -162,6 +162,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
     @Override
     protected void onDestroy() {
         Log.d(TAG, "--> onDestroy called");
+        mBroadcastMgr.unregisterReceiver(tokenReceiver);
         super.onDestroy();
     }
 
@@ -347,101 +348,37 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         alertDialog.show();
     }
 
-//    TODO create Handler to handle calls to tranSMART server
-//    Input: type of query, code
-//    Does: query, handling status codes, decoding JSON
-//    Output: JSON
-
-    private class TokenGetterTask extends AsyncTask<String, Void, ServerResult> {
-
-        @Override
-        protected ServerResult doInBackground(String... params) {
-
-            ServerResult serverResult = new ServerResult();
-
-            String code = String.valueOf(params[0]);
-
-            String serverUrl = transmartServer.getServerUrl();
-
-            String query = serverUrl + "/oauth/token?"
-                    + "grant_type=authorization_code"
-                    + "&client_id=" + CLIENT_ID
-                    + "&client_secret=" + CLIENT_SECRET
-                    + "&code=" + code
-                    + "&redirect_uri=" + "transmart://oauthresponse" //CALLBACK_URL
-                    ;
-
-
-            Log.v(TAG, "Sending query: [" + query + "].");
-// TODO Use httpUrlConnection instead of HttpClient. See NetworkingURL app as example.
-            HttpClient httpClient = new DefaultHttpClient();
-
-            HttpGet httpGet = new HttpGet(query);
-
-            String responseLine;
-            StringBuilder responseBuilder = new StringBuilder();
+    public void onTokenReceived(ServerResult serverResult) {
+        if (serverResult.getResponseCode() == 200) {
+            String access_token;
 
             try {
-                HttpResponse response = httpClient.execute(httpGet);
-                StatusLine statusLine = response.getStatusLine();
-                Log.i(TAG,"Statusline : " + statusLine);
-                int statusCode = statusLine.getStatusCode();
-                String statusDescription = statusLine.getReasonPhrase();
-                serverResult.setResponseCode(statusCode);
-                serverResult.setResponseDescription(statusDescription);
-
-                if (statusCode != 200) {
-                    return serverResult;
-                }
-
-                InputStream data = response.getEntity().getContent();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
-
-                while ((responseLine = bufferedReader.readLine()) != null) {
-                    responseBuilder.append(responseLine);
-                }
-                String result = responseBuilder.toString();
-                serverResult.setResult(result);
-                Log.i(TAG,"Response : " + result);
-
-            } catch (IOException e) {
+                JSONObject jObject = new JSONObject(serverResult.getResult());
+                access_token = jObject.getString("access_token");
+                transmartServer.setAccess_token(access_token);
+                String refresh_token = jObject.getString("refresh_token");
+                transmartServer.setRefresh_token(refresh_token);
+                Log.i(TAG,"access_token : " + access_token);
+                Log.i(TAG,"refresh_token : " + refresh_token);
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return serverResult;
-        }
-
-        protected void onPostExecute(ServerResult serverResult) {
-            super.onPostExecute(serverResult);
-
-            if (serverResult.getResponseCode() == 200) {
-                String access_token;
-
-                try {
-                    JSONObject jObject = new JSONObject(serverResult.getResult());
-                    access_token = jObject.getString("access_token");
-                    transmartServer.setAccess_token(access_token);
-                    String refresh_token = jObject.getString("refresh_token");
-                    transmartServer.setRefresh_token(refresh_token);
-                    Log.i(TAG,"access_token : " + access_token);
-                    Log.i(TAG,"refresh_token : " + refresh_token);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
 //                Display ServerOverview Fragment
-                Fragment fragment = new ServerOverviewFragment();
-                FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            Fragment fragment = new ServerOverviewFragment();
+            Log.i(TAG,"fragment: " + fragment);
+            FragmentManager fragmentManager = MainActivity.this.getFragmentManager();
+            Log.i(TAG,"fragmentManager: " + fragmentManager);
+            FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_frame);
+            Log.i(TAG,"frameLayout: " + frameLayout);
 
-            } else {
-                Toast toast = Toast.makeText(getBaseContext(), "Server responded with code "
-                        + serverResult.getResponseCode() +": "
-                        + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
-                toast.show();
-            }
+            fragmentManager.beginTransaction().replace(frameLayout.getId(), fragment).commitAllowingStateLoss();
+
+        } else {
+            Toast toast = Toast.makeText(getBaseContext(), "Server responded with code "
+                    + serverResult.getResponseCode() +": "
+                    + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
-
-
 }

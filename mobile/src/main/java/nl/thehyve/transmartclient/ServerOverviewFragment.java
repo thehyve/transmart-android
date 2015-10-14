@@ -76,8 +76,8 @@ public class ServerOverviewFragment extends Fragment {
     }
 
     public interface OnFragmentInteractionListener {
-        public void authorizationLost();
-        public void connectionLost();
+        void authorizationLost();
+        void connectionLost();
     }
 
     private class StudiesGetter extends AsyncTask<Void, Void, ServerResult> {

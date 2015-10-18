@@ -22,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONException;
@@ -37,7 +36,11 @@ import java.net.URL;
  * version 3, or (at your option) any later version.
  */
 
-public class MainActivity extends Activity implements ServerOverviewFragment.OnFragmentInteractionListener, TokenReceiver.TokenReceivedListener {
+public class MainActivity extends Activity implements
+        ServerOverviewFragment.OnFragmentInteractionListener,
+        GraphFragment.OnFragmentInteractionListener,
+        TokenReceiver.TokenReceivedListener,
+        RestInteractionListener {
 
     private static final String TAG = "MainActivity";
     private final IntentFilter intentFilter = new IntentFilter(TokenGetterTask.TOKEN_RECEIVED_INTENT);
@@ -48,6 +51,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
     public static TransmartServer transmartServer;
     private LocalBroadcastManager mBroadcastMgr;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +59,7 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        fragmentManager = getFragmentManager();
 
 //        When the activity is started from the OAuth return URL: Get the code out
         Intent intent = getIntent();
@@ -98,7 +103,6 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
 //            Go to the add new server page
             Fragment fragment = new AddNewServerFragment();
-            FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
 
@@ -222,8 +226,9 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
             return true;
         } else if (id == R.id.action_addNewServer) {
             Fragment fragment = new AddNewServerFragment();
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                    .addToBackStack("AddNewServerFragment")
+                    .commit();
         }
 
         return super.onOptionsItemSelected(item);
@@ -295,7 +300,38 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
 
     }
 
-    // Methods for ServerOverviewFragment
+    // Methods for TokenReceiver
+
+    public void onTokenReceived(ServerResult serverResult) {
+        if (serverResult.getResponseCode() == 200) {
+            String access_token;
+
+            try {
+                JSONObject jObject = new JSONObject(serverResult.getResult());
+                access_token = jObject.getString("access_token");
+                transmartServer.setAccess_token(access_token);
+                String refresh_token = jObject.getString("refresh_token");
+                transmartServer.setRefresh_token(refresh_token);
+                Log.i(TAG,"access_token : " + access_token);
+                Log.i(TAG,"refresh_token : " + refresh_token);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Fragment fragment = new ServerOverviewFragment();
+            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                    .addToBackStack("ServerOverviewFragment")
+                    .commitAllowingStateLoss();
+
+        } else {
+            Toast toast = Toast.makeText(getBaseContext(), "Server responded with code "
+                    + serverResult.getResponseCode() +": "
+                    + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+
+    // Methods for all REST calling fragments
 
     @Override
     public void authorizationLost() {
@@ -316,7 +352,6 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Try again", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Fragment fragment = new ServerOverviewFragment();
-                FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
         });
@@ -337,7 +372,6 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Try again", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 Fragment fragment = new ServerOverviewFragment();
-                FragmentManager fragmentManager = getFragmentManager();
                 fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
         });
@@ -348,37 +382,20 @@ public class MainActivity extends Activity implements ServerOverviewFragment.OnF
         alertDialog.show();
     }
 
-    public void onTokenReceived(ServerResult serverResult) {
-        if (serverResult.getResponseCode() == 200) {
-            String access_token;
+    // Methods for ServerOverviewFragment
 
-            try {
-                JSONObject jObject = new JSONObject(serverResult.getResult());
-                access_token = jObject.getString("access_token");
-                transmartServer.setAccess_token(access_token);
-                String refresh_token = jObject.getString("refresh_token");
-                transmartServer.setRefresh_token(refresh_token);
-                Log.i(TAG,"access_token : " + access_token);
-                Log.i(TAG,"refresh_token : " + refresh_token);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+    @Override
+    public void onStudyClicked(String studyId) {
+        Fragment fragment = GraphFragment.newInstance(studyId, transmartServer);
+        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                .addToBackStack("GraphFragment")
+                .commit();
+    }
 
-//                Display ServerOverview Fragment
-            Fragment fragment = new ServerOverviewFragment();
-            Log.i(TAG,"fragment: " + fragment);
-            FragmentManager fragmentManager = MainActivity.this.getFragmentManager();
-            Log.i(TAG,"fragmentManager: " + fragmentManager);
-            FrameLayout frameLayout = (FrameLayout) findViewById(R.id.content_frame);
-            Log.i(TAG,"frameLayout: " + frameLayout);
+    // Methods for GraphFragment
 
-            fragmentManager.beginTransaction().replace(frameLayout.getId(), fragment).commitAllowingStateLoss();
+    @Override
+    public void onFragmentInteraction(Uri uri) {
 
-        } else {
-            Toast toast = Toast.makeText(getBaseContext(), "Server responded with code "
-                    + serverResult.getResponseCode() +": "
-                    + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
-            toast.show();
-        }
     }
 }

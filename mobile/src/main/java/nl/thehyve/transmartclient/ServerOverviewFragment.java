@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -34,14 +35,22 @@ import java.util.ArrayList;
  * version 3, or (at your option) any later version.
  */
 
-public class ServerOverviewFragment extends Fragment {
+public class ServerOverviewFragment extends Fragment implements ListView.OnItemClickListener {
     private static final String TAG = "ServerOverviewFragment";
     private OnFragmentInteractionListener mListener;
+    private RestInteractionListener restInteractionListener;
+    private ArrayAdapter mAdapter;
+    private ArrayList<String> studyList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        studyList = new ArrayList<>();
+        mAdapter = new ArrayAdapter<>(getActivity(),
+                R.layout.study_item, R.id.studyName, studyList);
+
         // start StudiesGetter here?
     }
 
@@ -49,6 +58,13 @@ public class ServerOverviewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_serveroverview, container, false);
+
+        // Set the adapter
+        ListView mListView = (ListView) rootView.findViewById(R.id.studyList);
+        mListView.setAdapter(mAdapter);
+
+        // Set OnItemClickListener so we can be notified on item clicks
+        mListView.setOnItemClickListener(this);
 
 //      TODO Show waiting sign: "Retrieving studies"
 
@@ -63,9 +79,11 @@ public class ServerOverviewFragment extends Fragment {
         super.onAttach(activity);
         try {
             mListener = (OnFragmentInteractionListener) activity;
+            restInteractionListener = (RestInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnFragmentInteractionListener" +
+                    " and RestInteractionListener");
         }
     }
 
@@ -75,9 +93,14 @@ public class ServerOverviewFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String studyId = (String) parent.getItemAtPosition(position);
+        mListener.onStudyClicked(studyId);
+    }
+
     public interface OnFragmentInteractionListener {
-        void authorizationLost();
-        void connectionLost();
+        void onStudyClicked(String studyId);
     }
 
     private class StudiesGetter extends AsyncTask<Void, Void, ServerResult> {
@@ -148,8 +171,8 @@ public class ServerOverviewFragment extends Fragment {
                     JSONArray jArray = new JSONArray(serverResult.getResult());
                     Log.i(TAG, jArray.toString());
 
+                    studyList.clear();
 
-                    final ArrayList<String> studyList = new ArrayList<String>();
                     for (int i = 0; i < jArray.length(); i++) {
                         JSONObject study = jArray.getJSONObject(i);
                         String studyId = study.getString("id");
@@ -157,10 +180,7 @@ public class ServerOverviewFragment extends Fragment {
                         studyList.add(studyId);
                     }
 
-                    ListView studyListView = (ListView) getView().findViewById(R.id.studyList);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(),
-                            R.layout.study_item, R.id.studyName, studyList);
-                    studyListView.setAdapter(adapter);
+                    mAdapter.notifyDataSetChanged();
 
                 } catch (JSONException e) {
                     Log.i(TAG, "Couldn't parse to JSON: " + serverResult.getResult());

@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 22
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "nl.thehyve.transmartclient"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 8
-        versionName "0.5"
+        versionCode 9
+        versionName "0.6"
     }
     buildTypes {
         release {

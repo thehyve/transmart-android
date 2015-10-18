@@ -167,12 +167,12 @@ public class ServerOverviewFragment extends Fragment {
                     e.printStackTrace();
                 }
             } else if (serverResult.getResponseCode() == 401) {
-                if (mListener != null) {
-                    mListener.authorizationLost();
+                if (restInteractionListener != null) {
+                    restInteractionListener.authorizationLost();
                 }
             } else if (serverResult.getResponseCode() == 0) {
-                if (mListener != null) {
-                    mListener.connectionLost();
+                if (restInteractionListener != null) {
+                    restInteractionListener.connectionLost();
                 }
             } else {
                 Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Server responded with code "

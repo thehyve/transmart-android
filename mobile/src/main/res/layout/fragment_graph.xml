@@ -2,9 +2,10 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="nl.thehyve.transmartclient.GraphFragment">
 
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/chart"
+    <ListView
+        android:id="@+id/graphList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
+    </ListView>
 
 </FrameLayout>

@@ -1,6 +1,7 @@
 package nl.thehyve.transmartclient;
 
 import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,9 +11,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
-import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -30,6 +32,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,7 +56,8 @@ public class GraphFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private RestInteractionListener restInteractionListener;
-    private BarChart mBarChart;
+    private ChartDataAdapter cda;
+    private ArrayList<ChartItem> list;
 
     /**
      * Use this factory method to create a new instance of
@@ -76,9 +81,37 @@ public class GraphFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        list = new ArrayList<ChartItem>();
+        cda = new ChartDataAdapter(getActivity(), list);
+
         if (getArguments() != null) {
             studyId = getArguments().getString(ARG_STUDYID);
             new ConceptsGetter().execute();
+        }
+    }
+
+    /** adapter that supports 3 different item types */
+    private class ChartDataAdapter extends ArrayAdapter<ChartItem> {
+
+        public ChartDataAdapter(Context context, List<ChartItem> objects) {
+            super(context, 0, objects);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            return getItem(position).getView(position, convertView, getContext());
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            // return the views type
+            return getItem(position).getItemType();
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 3; // we have 3 different item-types
         }
     }
 
@@ -89,11 +122,9 @@ public class GraphFragment extends Fragment {
         getActivity().setTitle(studyId);
 
         View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
-        mBarChart = (BarChart) rootView.findViewById(R.id.chart);
-        mBarChart.setDescription("Age");
-        mBarChart.setNoDataTextDescription("Loading data...");
-        mBarChart.setDescriptionPosition(200, 130);
-        mBarChart.setDescriptionTextSize(100);
+
+        ListView lv = (ListView) rootView.findViewById(R.id.graphList);
+        lv.setAdapter(cda);
 
         // Inflate the layout for this fragment
         return rootView;
@@ -208,23 +239,19 @@ public class GraphFragment extends Fragment {
             if (serverResult.getResponseCode() == 200) {
                 try {
                     JSONObject json = new JSONObject(serverResult.getResult());
-                    JSONArray jArray = json.getJSONArray("ontology_terms");//new JSONArray(serverResult.getResult());
+                    JSONArray jArray = json.getJSONArray("ontology_terms");
                     Log.i(TAG, jArray.toString());
-
-//                    studyList.clear();
 
                     for (int i = 0; i < jArray.length(); i++) {
                         JSONObject concept = jArray.getJSONObject(i);
                         String conceptName = concept.getString("name");
                         Log.i(TAG, "Concept: " + conceptName);
-//                        studyList.add(studyId);
-                        if (conceptName.equals("Age")){
+                        if (conceptName.equals("Age") || conceptName.equals("FEV1")
+                                || conceptName.equals("Forced Expiratory Volume Ratio")
+                                || conceptName.equals("Height (inch)")){
                             new ObservationsGetter().execute(concept.getString("fullName"));
                         }
                     }
-
-//                    mAdapter.notifyDataSetChanged();
-
                 } catch (JSONException e) {
                     Log.i(TAG, "Couldn't parse to JSON: " + serverResult.getResult());
                     e.printStackTrace();
@@ -254,7 +281,15 @@ public class GraphFragment extends Fragment {
             String[] fullName = params[0].split("\\\\");
             Log.d(TAG,"fullName: " + fullName);
             fullName = Arrays.copyOfRange(fullName, 3, fullName.length);
-            String conceptLink = TextUtils.join("/", fullName);
+            for (int i=0;i<fullName.length;i++) {
+                try {
+                    fullName[i] = URLEncoder.encode(fullName[i],"utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+            String conceptLink = null;
+            conceptLink = TextUtils.join("/", fullName);
             Log.d(TAG,"conceptLink: " + conceptLink);
             ServerResult serverResult = new ServerResult();
 
@@ -368,8 +403,8 @@ public class GraphFragment extends Fragment {
                 }
 
                 Collections.sort(valueList);
-                float min = valueList.get(0);//0;
-                float max = valueList.get(valueList.size() - 1);//100;
+                float min = valueList.get(0);
+                float max = valueList.get(valueList.size() - 1);
                 int nrbins = 10;
                 float binwidth = (max-min)/nrbins;
                 final int[] result = new int[nrbins];
@@ -394,7 +429,7 @@ public class GraphFragment extends Fragment {
                     line.add(newEntry);
                 }
 
-                BarDataSet setComp1 = new BarDataSet(line, studyId);
+                BarDataSet setComp1 = new BarDataSet(line, "Subset 1");
                 setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
 
                 ArrayList<BarDataSet> dataSets = new ArrayList<>();
@@ -418,8 +453,9 @@ public class GraphFragment extends Fragment {
 
         protected void onPostExecute(BarData data) {
             super.onPostExecute(data);
-            mBarChart.setData(data);
-            mBarChart.invalidate();
+            BarChartItem newBarChart = new BarChartItem(data, getActivity());
+            list.add(newBarChart);
+            cda.notifyDataSetChanged();
         }
     }
 

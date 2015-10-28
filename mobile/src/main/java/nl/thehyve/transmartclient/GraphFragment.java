@@ -24,9 +24,15 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -38,7 +44,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -58,6 +67,8 @@ public class GraphFragment extends Fragment {
     private RestInteractionListener restInteractionListener;
     private ChartDataAdapter cda;
     private ArrayList<ChartItem> list;
+
+    Gson gson = new Gson();
 
     /**
      * Use this factory method to create a new instance of
@@ -237,24 +248,23 @@ public class GraphFragment extends Fragment {
             super.onPostExecute(serverResult);
 
             if (serverResult.getResponseCode() == 200) {
-                try {
-                    JSONObject json = new JSONObject(serverResult.getResult());
-                    JSONArray jArray = json.getJSONArray("ontology_terms");
-                    Log.i(TAG, jArray.toString());
+                JsonParser parser = new JsonParser();
+                JsonObject json = (JsonObject) parser.parse(serverResult.getResult());
+                JsonArray jArray = json.get("ontology_terms").getAsJsonArray();
+                Log.i(TAG, jArray.toString());
 
-                    for (int i = 0; i < jArray.length(); i++) {
-                        JSONObject concept = jArray.getJSONObject(i);
-                        String conceptName = concept.getString("name");
-                        Log.i(TAG, "Concept: " + conceptName);
-                        if (conceptName.equals("Age") || conceptName.equals("FEV1")
-                                || conceptName.equals("Forced Expiratory Volume Ratio")
-                                || conceptName.equals("Height (inch)")){
-                            new ObservationsGetter().execute(concept.getString("fullName"));
-                        }
+                for (int i = 0; i < jArray.size(); i++) {
+                    JsonElement conceptJSON = jArray.get(i);
+                    Concept concept = gson.fromJson(conceptJSON, Concept.class);
+                    String conceptName = concept.getName();
+                    String conceptType = concept.getType();
+                    Log.i(TAG, "Concept: " + conceptName + " (" + conceptType + ")");
+                    if (conceptName.equals("Age")
+                            || conceptName.equals("Sex")
+                            || conceptName.equals("Gender")
+                            || conceptName.equals("Race")) {
+                        new ObservationsGetter().execute(concept);
                     }
-                } catch (JSONException e) {
-                    Log.i(TAG, "Couldn't parse to JSON: " + serverResult.getResult());
-                    e.printStackTrace();
                 }
             } else if (serverResult.getResponseCode() == 401) {
                 if (restInteractionListener != null) {
@@ -273,12 +283,13 @@ public class GraphFragment extends Fragment {
         }
     }
 
-    private class ObservationsGetter extends AsyncTask<String, Void, ServerResult> {
+    private class ObservationsGetter extends AsyncTask<Concept, Void, ServerResult> {
+        private Concept concept;
 
         @Override
-        protected ServerResult doInBackground(String... params) {
-
-            String[] fullName = params[0].split("\\\\");
+        protected ServerResult doInBackground(Concept... params) {
+            concept = params[0];
+            String[] fullName = concept.getFullName().split("\\\\");
             Log.d(TAG,"fullName: " + fullName);
             fullName = Arrays.copyOfRange(fullName, 3, fullName.length);
             for (int i=0;i<fullName.length;i++) {
@@ -354,13 +365,11 @@ public class GraphFragment extends Fragment {
             super.onPostExecute(serverResult);
 
             if (serverResult.getResponseCode() == 200) {
-                try {
-                    JSONArray jArray = new JSONArray(serverResult.getResult());
-                    Log.i(TAG, jArray.toString());
-                    new CalculateHistogram().execute(jArray);
-                } catch (JSONException e) {
-                    Log.i(TAG, "Couldn't parse to JSON: " + serverResult.getResult());
-                    e.printStackTrace();
+                Observation[] observations = gson.fromJson(serverResult.getResult(),Observation[].class);
+                if (concept.getType().equals("NUMERIC")) {
+                    new CalculateNumericHistogram().execute(observations);
+                } else if (concept.getType().equals("UNKNOWN")) {
+                    new CalculateCategoricalPiechart().execute(observations);
                 }
             } else if (serverResult.getResponseCode() == 401) {
                 if (restInteractionListener != null) {
@@ -379,74 +388,66 @@ public class GraphFragment extends Fragment {
         }
     }
 
-    private class CalculateHistogram extends AsyncTask<JSONArray, Void, BarData> {
+    private class CalculateNumericHistogram extends AsyncTask<Observation[], Void, BarData> {
 
         @Override
-        protected BarData doInBackground(JSONArray... params) {
+        protected BarData doInBackground(Observation[]... params) {
 
-            BarData data = new BarData();
+            BarData data;
 
-            try {
+            Observation[] observations = params[0];
 
-                JSONArray jArray = params[0];
+            List<Float> valueList = new ArrayList<>();
 
-                List<Float> valueList = new ArrayList<>();
-
-                for (int i = 0; i < jArray.length(); i++) {
-                    JSONObject observation = jArray.getJSONObject(i);;
-                    String valueString = observation.getString("value");
-                    Log.i(TAG, "Value: " + valueString);
-                    if (! valueString.equals("null")) {
-                        float value = Float.parseFloat(valueString);
-                        valueList.add(value);
-                    }
+            for (Observation observation : observations) {
+                String valueString = observation.getValue();
+                Log.i(TAG, "Value: " + valueString);
+                if (valueString != null) {
+                    float value = Float.parseFloat(valueString);
+                    valueList.add(value);
                 }
-
-                Collections.sort(valueList);
-                float min = valueList.get(0);
-                float max = valueList.get(valueList.size() - 1);
-                int nrbins = 10;
-                float binwidth = (max-min)/nrbins;
-                final int[] result = new int[nrbins];
-
-                for (int i = 0; i < jArray.length(); i++) {
-                    JSONObject observation = jArray.getJSONObject(i);;
-                    String valueString = observation.getString("value");
-                    Log.i(TAG, "Value: " + valueString);
-                    if (! valueString.equals("null")) {
-                        float value = Float.parseFloat(valueString);
-                        int bin = (int) ((value - min) / binwidth);
-                        if (bin >= 0 && bin < nrbins) {
-                            result[bin] += 1;
-                        }
-                    }
-                }
-
-                ArrayList<BarEntry> line = new ArrayList<>();
-
-                for (int i=0; i < result.length; i++) {
-                    BarEntry newEntry = new BarEntry(result[i], i);
-                    line.add(newEntry);
-                }
-
-                BarDataSet setComp1 = new BarDataSet(line, "Subset 1");
-                setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
-
-                ArrayList<BarDataSet> dataSets = new ArrayList<>();
-                dataSets.add(setComp1);
-
-                ArrayList<String> xVals = new ArrayList<>();
-
-                for (int i = 0; i < nrbins; i++) {
-                    String xVal = (i*binwidth) + "-" + ((i+1)*binwidth);
-                    xVals.add(xVal);
-                }
-
-                data = new BarData(xVals, dataSets);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+
+            Collections.sort(valueList);
+            float min = valueList.get(0);
+            float max = valueList.get(valueList.size() - 1);
+            int nrbins = 10;
+            float binwidth = (max-min)/nrbins;
+            final int[] result = new int[nrbins];
+
+            for (Observation observation : observations) {
+                String valueString = observation.getValue();
+                Log.i(TAG, "Value: " + valueString);
+                if (valueString != null) {
+                    float value = Float.parseFloat(valueString);
+                    int bin = (int) ((value - min) / binwidth);
+                    if (bin >= 0 && bin < nrbins) {
+                        result[bin] += 1;
+                    }
+                }
+            }
+
+            ArrayList<BarEntry> line = new ArrayList<>();
+
+            for (int i=0; i < result.length; i++) {
+                BarEntry newEntry = new BarEntry(result[i], i);
+                line.add(newEntry);
+            }
+
+            BarDataSet setComp1 = new BarDataSet(line, "Subset 1");
+            setComp1.setAxisDependency(YAxis.AxisDependency.LEFT);
+
+            ArrayList<BarDataSet> dataSets = new ArrayList<>();
+            dataSets.add(setComp1);
+
+            ArrayList<String> xVals = new ArrayList<>();
+
+            for (int i = 0; i < nrbins; i++) {
+                String xVal = (i*binwidth) + "-" + ((i+1)*binwidth);
+                xVals.add(xVal);
+            }
+
+            data = new BarData(xVals, dataSets);
 
             return data;
         }
@@ -455,6 +456,58 @@ public class GraphFragment extends Fragment {
             super.onPostExecute(data);
             BarChartItem newBarChart = new BarChartItem(data, getActivity());
             list.add(newBarChart);
+            cda.notifyDataSetChanged();
+        }
+    }
+
+    private class CalculateCategoricalPiechart extends AsyncTask<Observation[], Void, PieData> {
+
+        @Override
+        protected PieData doInBackground(Observation[]... params) {
+
+            PieData data;
+
+            Observation[] observations = params[0];
+
+            Map<String,Integer> valueMap = new HashMap<>();
+
+            for (Observation observation : observations) {
+                String valueString = observation.getValue();
+                Log.i(TAG, "Value: " + valueString);
+                if (valueString != null) {
+                    Integer count = valueMap.get(valueString);
+                    if (count != null) {
+                        valueMap.put(valueString, count + 1);
+                    } else {
+                        valueMap.put(valueString, 1);
+                    }
+                }
+            }
+
+            ArrayList<Entry> line = new ArrayList<>();
+            ArrayList<String> xVals = new ArrayList<>();
+
+            int j = 0;
+            for (Map.Entry<String, Integer> entry : valueMap.entrySet()) {
+                line.add(new Entry(entry.getValue(), j));
+                xVals.add(j, entry.getKey());
+                j++;
+            }
+
+            PieDataSet setComp1 = new PieDataSet(line, "Subset 1");
+            setComp1.setSliceSpace(2f);
+            setComp1.setColors(ColorTemplate.VORDIPLOM_COLORS);
+
+
+            data = new PieData(xVals, setComp1);
+
+            return data;
+        }
+
+        protected void onPostExecute(PieData data) {
+            super.onPostExecute(data);
+            PieChartItem newPieChart = new PieChartItem(data, getActivity());
+            list.add(newPieChart);
             cda.notifyDataSetChanged();
         }
     }

@@ -1,9 +1,8 @@
 
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.chartItems;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.RelativeSizeSpan;
@@ -17,6 +16,8 @@ import com.github.mikephil.charting.data.ChartData;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.formatter.PercentFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
+
+import nl.thehyve.transmartclient.R;
 
 public class PieChartItem extends ChartItem {
 

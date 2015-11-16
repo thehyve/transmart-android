@@ -1,4 +1,4 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.apiItems;
 
 /**
  * Created by Ward Weistra on 27-10-15.

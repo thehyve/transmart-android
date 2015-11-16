@@ -1,4 +1,4 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.chartItems;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import com.github.mikephil.charting.components.XAxis.XAxisPosition;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.ChartData;
+
+import nl.thehyve.transmartclient.R;
 
 public class BarChartItem extends ChartItem {
 

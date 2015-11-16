@@ -1,4 +1,4 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -27,6 +27,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import nl.thehyve.transmartclient.MainActivity;
+import nl.thehyve.transmartclient.R;
+import nl.thehyve.transmartclient.rest.RestInteractionListener;
+import nl.thehyve.transmartclient.rest.ServerResult;
 
 /**
  * Created by Ward Weistra on 01-12-14.

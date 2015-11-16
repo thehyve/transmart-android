@@ -29,6 +29,15 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import nl.thehyve.transmartclient.fragments.AddNewServerFragment;
+import nl.thehyve.transmartclient.fragments.GraphFragment;
+import nl.thehyve.transmartclient.fragments.ServerOverviewFragment;
+import nl.thehyve.transmartclient.oauth.TokenGetterTask;
+import nl.thehyve.transmartclient.oauth.TokenReceiver;
+import nl.thehyve.transmartclient.rest.RestInteractionListener;
+import nl.thehyve.transmartclient.rest.ServerResult;
+import nl.thehyve.transmartclient.rest.TransmartServer;
+
 /**
  * Created by Ward Weistra.
  * Copyright (c) 2015 The Hyve B.V.

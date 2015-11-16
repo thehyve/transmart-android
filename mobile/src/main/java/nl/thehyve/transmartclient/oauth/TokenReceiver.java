@@ -1,9 +1,11 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.oauth;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import nl.thehyve.transmartclient.rest.ServerResult;
 
 /**
  * Created by Ward Weistra on 13-10-15.
@@ -22,7 +24,7 @@ public class TokenReceiver extends BroadcastReceiver {
         this.mListener.onTokenReceived(serverResult);
     }
 
-    void setTokenReceivedListener(TokenReceivedListener mListener){
+    public void setTokenReceivedListener(TokenReceivedListener mListener){
         this.mListener=mListener;
     }
 

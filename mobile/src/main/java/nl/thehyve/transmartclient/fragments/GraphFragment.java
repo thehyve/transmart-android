@@ -1,4 +1,4 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.fragments;
 
 import android.app.Activity;
 import android.content.Context;
@@ -44,10 +44,20 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import nl.thehyve.transmartclient.MainActivity;
+import nl.thehyve.transmartclient.R;
+import nl.thehyve.transmartclient.apiItems.Concept;
+import nl.thehyve.transmartclient.apiItems.Observation;
+import nl.thehyve.transmartclient.rest.RestInteractionListener;
+import nl.thehyve.transmartclient.rest.ServerResult;
+import nl.thehyve.transmartclient.rest.TransmartServer;
+import nl.thehyve.transmartclient.chartItems.BarChartItem;
+import nl.thehyve.transmartclient.chartItems.ChartItem;
+import nl.thehyve.transmartclient.chartItems.PieChartItem;
 
 /**
  * A simple {@link Fragment} subclass.

@@ -1,4 +1,4 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.rest;
 
 import android.os.Parcel;
 import android.os.Parcelable;

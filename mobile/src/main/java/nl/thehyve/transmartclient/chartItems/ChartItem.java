@@ -1,4 +1,4 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.chartItems;
 
 import android.content.Context;
 import android.view.View;

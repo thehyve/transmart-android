@@ -1,10 +1,12 @@
-package nl.thehyve.transmartclient;
+package nl.thehyve.transmartclient.fragments;
 
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import nl.thehyve.transmartclient.R;
 
 /**
  * Created by Ward Weistra on 01-12-14.

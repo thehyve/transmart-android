@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements
 
             transmartServer = new TransmartServer();
             String currentServerUrl = settings.getString("currentServerUrl", "");
-            Log.d(TAG,"Retrieved currentServerUrl from settings: "+currentServerUrl);
+            Log.d(TAG, "Retrieved currentServerUrl from settings: " + currentServerUrl);
             transmartServer.setServerUrl(currentServerUrl);
 
             SharedPreferences.Editor editor = settings.edit();
@@ -113,17 +113,8 @@ public class MainActivity extends AppCompatActivity implements
             new TokenGetterTask(this.getApplicationContext(), transmartServer, CLIENT_ID, CLIENT_SECRET).execute(code);
         }
 
-        if (savedInstanceState != null) {
-            transmartServer = savedInstanceState.getParcelable("transmartServer");
-            if (transmartServer != null) {
-                Log.d(TAG, "savedInstanceState not null. ServerURL from parcel: " + transmartServer.getServerUrl());
-            } else {
-                Log.d(TAG, "savedInstanceState not null. No transmartServer in parcel.");
-            }
-        } else {
+        if (savedInstanceState == null) {
             Log.d(TAG, "savedInstanceState is null");
-
-//            Go to the add new server page
             Fragment fragment = new AddNewServerFragment();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
@@ -162,6 +153,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         Log.d(TAG, "--> onRestoreInstanceState called");
+        transmartServer = savedInstanceState.getParcelable("transmartServer");
         super.onRestoreInstanceState(savedInstanceState);
     }
 

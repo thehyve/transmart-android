@@ -3,6 +3,8 @@
 
     <string name="app_name">TranSMART Client</string>
     <string name="welcomeText">Welcome, please add your tranSMART server from the menu to start.</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Add new server -->
     <string name="addServerText">Enter your tranSMART address below and give this application permission to access your data.</string>

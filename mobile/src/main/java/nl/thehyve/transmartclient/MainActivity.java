@@ -1,9 +1,6 @@
 package nl.thehyve.transmartclient;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,6 +11,11 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
@@ -28,6 +30,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
+import android.support.v4.app.Fragment;
 
 import nl.thehyve.transmartclient.fragments.AddNewServerFragment;
 import nl.thehyve.transmartclient.fragments.GraphFragment;
@@ -45,7 +48,7 @@ import nl.thehyve.transmartclient.rest.TransmartServer;
  * version 3, or (at your option) any later version.
  */
 
-public class MainActivity extends Activity implements
+public class MainActivity extends AppCompatActivity implements
         ServerOverviewFragment.OnFragmentInteractionListener,
         GraphFragment.OnFragmentInteractionListener,
         TokenReceiver.TokenReceivedListener,
@@ -60,7 +63,7 @@ public class MainActivity extends Activity implements
 
     public static TransmartServer transmartServer;
     private LocalBroadcastManager mBroadcastMgr;
-    private FragmentManager fragmentManager;
+    private android.support.v4.app.FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +71,17 @@ public class MainActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fragmentManager = getFragmentManager();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_view);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+
+        fragmentManager = getSupportFragmentManager();
 
 //        When the activity is started from the OAuth return URL: Get the code out
         Intent intent = getIntent();
@@ -120,6 +133,16 @@ public class MainActivity extends Activity implements
         tokenReceiver.setTokenReceivedListener(this);
         mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_view);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override

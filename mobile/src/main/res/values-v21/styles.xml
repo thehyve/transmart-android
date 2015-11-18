@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="android:Theme.Material.Light">
-        <item name="android:colorPrimary">@color/transmartBlue</item>
-        <item name="android:colorPrimaryDark">@color/darkTransmartBlue</item>
-    </style>
+
+        <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+                <!-- Customize your theme here. -->
+                <item name="colorPrimary">@color/transmartBlue</item>
+                <item name="colorPrimaryDark">@color/darkTransmartBlue</item>
+                <item name="colorAccent">@color/accentTransmart</item>
+                <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+                <item name="android:statusBarColor">@android:color/transparent</item>
+        </style>
 </resources>

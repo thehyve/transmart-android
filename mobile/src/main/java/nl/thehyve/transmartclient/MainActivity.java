@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG,"--> onCreate called");
+        Log.d(TAG, "--> onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -139,13 +139,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onStop() {
-        Log.d(TAG,"--> onStop called");
+        Log.d(TAG, "--> onStop called");
         super.onStop();
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        Log.d(TAG,"--> onSaveInstanceState called");
+        Log.d(TAG, "--> onSaveInstanceState called");
         // Always call the superclass so it can save the view hierarchy state
         savedInstanceState.putParcelable("transmartServer", transmartServer);
         super.onSaveInstanceState(savedInstanceState);

@@ -10,6 +10,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -26,7 +27,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.net.MalformedURLException;
@@ -266,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements
         String serverUrl = serverUrlEditText.getText().toString();
 
         if (serverUrl.equals("")) {
-            Toast.makeText(this, "Please specify your server URL", Toast.LENGTH_SHORT).show();
+            TextInputLayout inputServerUrl = (TextInputLayout) findViewById(R.id.input_server_url);
+            inputServerUrl.setError(getString(R.string.no_server_url_specified));
             return;
         }
 
@@ -279,8 +280,8 @@ public class MainActivity extends AppCompatActivity implements
         try {
             new URL(serverUrl);
         } catch (MalformedURLException e) {
-            Toast toast = Toast.makeText(this, "Please specify the URL of your tranSMART server, starting with http:// or https://", Toast.LENGTH_SHORT);
-            toast.show();
+            TextInputLayout inputServerUrl = (TextInputLayout) findViewById(R.id.input_server_url);
+            inputServerUrl.setError(getString(R.string.malformed_url));
             return;
         }
 
@@ -319,8 +320,9 @@ public class MainActivity extends AppCompatActivity implements
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Toast toast = Toast.makeText(this, "There is no app installed to open the URL "+serverUrl, Toast.LENGTH_SHORT);
-            toast.show();
+            String message = String.format(getString(R.string.no_app_for_url), serverUrl);
+            TextInputLayout inputServerUrl = (TextInputLayout) findViewById(R.id.input_server_url);
+            inputServerUrl.setError(message);
         }
 
     }
@@ -349,10 +351,18 @@ public class MainActivity extends AppCompatActivity implements
                     .commitAllowingStateLoss();
 
         } else {
-            Toast toast = Toast.makeText(getBaseContext(), "Server responded with code "
-                    + serverResult.getResponseCode() +": "
-                    + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
-            toast.show();
+
+            String message = String.format(getString(R.string.server_responded_with),
+                    serverResult.getResponseCode(),
+                    serverResult.getResponseDescription());
+            Log.d(TAG, message);
+            Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                }
+            }).show();
+
         }
     }
 

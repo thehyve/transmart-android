@@ -176,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements
                             Fragment fragment = new ServerOverviewFragment();
                             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
                                     .addToBackStack("ServerOverviewFragment")
-                                    .commitAllowingStateLoss();
+                                    .commit();
                             return true;
                         }
                     }

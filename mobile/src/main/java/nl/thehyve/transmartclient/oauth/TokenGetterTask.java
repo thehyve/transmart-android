@@ -6,17 +6,6 @@ import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import nl.thehyve.transmartclient.rest.ServerResult;
 import nl.thehyve.transmartclient.rest.TransmartServer;
 
@@ -64,42 +53,8 @@ public class TokenGetterTask extends AsyncTask<String, Void, ServerResult> {
 
 
         Log.v(TAG, "Sending query: [" + query + "].");
-// TODO Use httpUrlConnection instead of HttpClient. See NetworkingURL app as example.
-        HttpClient httpClient = new DefaultHttpClient();
 
-        HttpGet httpGet = new HttpGet(query);
-
-        String responseLine;
-        StringBuilder responseBuilder = new StringBuilder();
-
-        try {
-            HttpResponse response = httpClient.execute(httpGet);
-            StatusLine statusLine = response.getStatusLine();
-            Log.i(TAG,"Statusline : " + statusLine);
-            int statusCode = statusLine.getStatusCode();
-            String statusDescription = statusLine.getReasonPhrase();
-            serverResult.setResponseCode(statusCode);
-            serverResult.setResponseDescription(statusDescription);
-
-            if (statusCode != 200) {
-                return serverResult;
-            }
-
-            InputStream data = response.getEntity().getContent();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
-
-            while ((responseLine = bufferedReader.readLine()) != null) {
-                responseBuilder.append(responseLine);
-            }
-            String result = responseBuilder.toString();
-            serverResult.setResult(result);
-            Log.i(TAG,"Response : " + result);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return serverResult;
+        return serverResult.getServerResult(null, query);
     }
 
     protected void onPostExecute(ServerResult serverResult) {

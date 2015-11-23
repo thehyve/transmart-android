@@ -20,10 +20,6 @@ import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -34,13 +30,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -211,46 +202,7 @@ public class GraphFragment extends Fragment {
 
             Log.v(TAG, "Sending query: [" + query + "].");
 
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-
-            HttpGet httpGet = new HttpGet(query);
-            httpGet.addHeader("Authorization","Bearer " + access_token);
-
-            String responseLine;
-            StringBuilder responseBuilder = new StringBuilder();
-            String queryResult;
-            try {
-                HttpResponse response = httpClient.execute(httpGet);
-
-                StatusLine statusLine = response.getStatusLine();
-                Log.i(TAG,"Statusline : " + statusLine);
-                int statusCode = statusLine.getStatusCode();
-                String statusDescription = statusLine.getReasonPhrase();
-                serverResult.setResponseCode(statusCode);
-                serverResult.setResponseDescription(statusDescription);
-
-                if (statusCode != 200) {
-                    return serverResult;
-                }
-
-                InputStream data = response.getEntity().getContent();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
-
-                while ((responseLine = bufferedReader.readLine()) != null) {
-                    responseBuilder.append(responseLine);
-                }
-                queryResult = responseBuilder.toString();
-                serverResult.setResult(queryResult);
-                Log.i(TAG,"Response : " + queryResult);
-
-            } catch (UnknownHostException e){
-                serverResult.setResponseCode(0);
-                serverResult.setResponseDescription(getString(R.string.check_internet));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return serverResult;
+            return serverResult.getServerResult(access_token, query);
         }
 
         @Override
@@ -332,46 +284,7 @@ public class GraphFragment extends Fragment {
 
             Log.v(TAG, "Sending query: [" + query + "].");
 
-            DefaultHttpClient httpClient = new DefaultHttpClient();
-
-            HttpGet httpGet = new HttpGet(query);
-            httpGet.addHeader("Authorization","Bearer " + access_token);
-
-            String responseLine;
-            StringBuilder responseBuilder = new StringBuilder();
-            String queryResult;
-            try {
-                HttpResponse response = httpClient.execute(httpGet);
-
-                StatusLine statusLine = response.getStatusLine();
-                Log.i(TAG,"Statusline : " + statusLine);
-                int statusCode = statusLine.getStatusCode();
-                String statusDescription = statusLine.getReasonPhrase();
-                serverResult.setResponseCode(statusCode);
-                serverResult.setResponseDescription(statusDescription);
-
-                if (statusCode != 200) {
-                    return serverResult;
-                }
-
-                InputStream data = response.getEntity().getContent();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(data));
-
-                while ((responseLine = bufferedReader.readLine()) != null) {
-                    responseBuilder.append(responseLine);
-                }
-                queryResult = responseBuilder.toString();
-                serverResult.setResult(queryResult);
-                Log.i(TAG,"Response : " + queryResult);
-
-            } catch (UnknownHostException e){
-                serverResult.setResponseCode(0);
-                serverResult.setResponseDescription(getString(R.string.check_internet));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return serverResult;
+            return serverResult.getServerResult(access_token, query);
         }
 
         @Override

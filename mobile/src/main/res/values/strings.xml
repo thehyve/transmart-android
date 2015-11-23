@@ -3,6 +3,7 @@
 
     <string name="app_name">TranSMART Client</string>
     <string name="welcomeText">Welcome, please add your tranSMART server from the menu to start.</string>
+    <string name="app__display_name">TranSMART</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

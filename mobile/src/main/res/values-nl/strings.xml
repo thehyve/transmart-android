@@ -11,4 +11,5 @@
     <string name="serverOverview">Server overzicht</string>
     <string name="studyOverviewIntro">Dit zijn de studies in deze tranSMART server.</string>
     <string name="welcomeText">Welkom, voeg om te beginnen jouw tranSMART server toe via het menu.</string>
+    <string name="app__display_name">TranSMART</string>
 </resources>

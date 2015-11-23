@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -72,6 +73,7 @@ public class GraphFragment extends Fragment {
     private static final String TAG = "GraphFragment";
 
     private String studyId;
+    private View rootView;
 
     private OnFragmentInteractionListener mListener;
     private RestInteractionListener restInteractionListener;
@@ -142,7 +144,7 @@ public class GraphFragment extends Fragment {
 
         getActivity().setTitle(studyId);
 
-        View rootView = inflater.inflate(R.layout.fragment_graph, container, false);
+        rootView = inflater.inflate(R.layout.fragment_graph, container, false);
 
         ListView lv = (ListView) rootView.findViewById(R.id.graphList);
         lv.setAdapter(cda);
@@ -285,10 +287,15 @@ public class GraphFragment extends Fragment {
                     restInteractionListener.connectionLost();
                 }
             } else {
-                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Server responded with code "
-                        + serverResult.getResponseCode() + ": "
-                        + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
-                toast.show();
+                String message = String.format(getString(R.string.server_responded_with),
+                        serverResult.getResponseCode(),
+                        serverResult.getResponseDescription());
+                Snackbar.make(rootView, message, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                            }
+                        }).show();
             }
         }
     }

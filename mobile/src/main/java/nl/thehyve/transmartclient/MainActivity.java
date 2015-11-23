@@ -10,7 +10,10 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,6 +26,7 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -31,6 +35,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.support.v4.app.Fragment;
 
 import nl.thehyve.transmartclient.fragments.AddNewServerFragment;
@@ -62,9 +69,13 @@ public class MainActivity extends AppCompatActivity implements
     public static String CLIENT_ID = "android-client";
     public static String CLIENT_SECRET = "";
 
+    public static List<TransmartServer> transmartServers = new ArrayList<>();
     public static TransmartServer transmartServer;
+    private CoordinatorLayout coordinatorLayout;
     private LocalBroadcastManager mBroadcastMgr;
     private android.support.v4.app.FragmentManager fragmentManager;
+
+    Integer about_item, add_server_item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,11 +86,108 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_view);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                hideKeyboard();
+            }
+        };
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        refreshNavigationMenu();
+
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
+            // This method will trigger on item Click of navigation menu
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                Integer menuItemId = menuItem.getItemId();
+                Log.d(TAG,"menuItem ID: "+ menuItemId);
+
+                if (!menuItemId.equals(about_item)) {
+                    //Checking if the item is in checked state or not, if not make it in checked state
+                    if (menuItem.isChecked()) menuItem.setChecked(false);
+                    else menuItem.setChecked(true);
+
+                    //Closing drawer on item click
+                    drawer.closeDrawers();
+                }
+
+                //Check to see which item was being clicked and perform appropriate action
+                if (menuItemId.equals(about_item)) {
+                    Log.d(TAG,"about_item: "+ about_item);
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                    alertDialog.setTitle(R.string.info_title);
+
+                    PackageInfo pInfo = null;
+                    try {
+                        pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    assert pInfo != null;
+                    String versionName = pInfo.versionName;
+                    int versionCode = pInfo.versionCode;
+
+                    final TextView message = new TextView(MainActivity.this);
+                    message.setMovementMethod(LinkMovementMethod.getInstance());
+
+                    SpannableString s = new SpannableString(
+                            "Version " + versionName + " (version code " + versionCode + ")\n" +
+                                    "\n" +
+                                    "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
+                                    "\n" +
+                                    "This code is licensed under the GNU Lesser General Public License, " +
+                                    "version 3, or (at your option) any later version.\n" +
+                                    "\n" +
+                                    "Contribute at https://github.com/wardweistra/tranSMARTClient"
+                    );
+                    Linkify.addLinks(s, Linkify.WEB_URLS);
+                    message.setText(s);
+                    alertDialog.setView(message, 30, 30, 30, 30);
+                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                        }
+                    });
+                    // Set the Icon for the Dialog
+                    alertDialog.setIcon(R.drawable.thehyve);
+                    alertDialog.show();
+
+                    return true;
+                } else if (menuItemId.equals(add_server_item)) {
+                    Log.d(TAG,"add_server_item: "+ add_server_item);
+
+                    Fragment fragment = new AddNewServerFragment();
+                    fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                            .addToBackStack("AddNewServerFragment")
+                            .commit();
+                    return true;
+                } else {
+
+                    for (TransmartServer transmartServerItem : transmartServers){
+                        Log.d(TAG,"transmartServerItem ID: "+ transmartServerItem.getMenuItemID());
+
+                        if (menuItemId.equals(transmartServerItem.getMenuItemID())) {
+                            transmartServer = transmartServerItem;
+                            Fragment fragment = new ServerOverviewFragment();
+                            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                                    .addToBackStack("ServerOverviewFragment")
+                                    .commitAllowingStateLoss();
+                            return true;
+                        }
+                    }
+
+                    return true;
+                }
+
+            }
+        });
 
 
         fragmentManager = getSupportFragmentManager();
@@ -87,8 +195,10 @@ public class MainActivity extends AppCompatActivity implements
 //        When the activity is started from the OAuth return URL: Get the code out
         Intent intent = getIntent();
         Uri uri = intent.getData();
+        Log.d(TAG,"uri: "+uri);
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         boolean oauthCodeUsed = settings.getBoolean("oauthCodeUsed", false);
+        Log.d(TAG,"oauthCodeUsed: "+oauthCodeUsed);
         if (
                 uri != null
                 && uri.toString().startsWith("transmart://oauthresponse")
@@ -104,8 +214,11 @@ public class MainActivity extends AppCompatActivity implements
 
             transmartServer = new TransmartServer();
             String currentServerUrl = settings.getString("currentServerUrl", "");
+            String currentServerLabel = settings.getString("currentServerLabel", "");
             Log.d(TAG, "Retrieved currentServerUrl from settings: " + currentServerUrl);
+            Log.d(TAG, "Retrieved currentServerLabel from settings: " + currentServerLabel);
             transmartServer.setServerUrl(currentServerUrl);
+            transmartServer.setServerLabel(currentServerLabel);
 
             SharedPreferences.Editor editor = settings.edit();
             editor.putBoolean("oauthCodeUsed", true);
@@ -124,7 +237,32 @@ public class MainActivity extends AppCompatActivity implements
                 .getInstance(getApplicationContext());
         tokenReceiver.setTokenReceivedListener(this);
         mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
+    }
 
+    private void refreshNavigationMenu() {
+
+        NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        final Menu menu = mNavigationView.getMenu();
+
+        menu.clear();
+
+        SubMenu serverMenu = menu.addSubMenu(1,1,Menu.NONE,"Servers");
+        serverMenu.setGroupCheckable(2,true,true);
+        Integer order = 2;
+        Log.d(TAG,"Number of servers connected for menu: "+transmartServers.size());
+        for (TransmartServer transmartServer : transmartServers) {
+            Integer menuItemID = serverMenu.add(2, order, Menu.NONE, transmartServer.getServerLabel())
+                    .setIcon(R.drawable.ic_action_accounts)
+                    .getItemId();
+            transmartServer.setMenuItemID(menuItemID);
+            order += 1;
+        }
+        add_server_item = serverMenu.add(2,order,Menu.NONE,"Add server").setIcon(R.drawable.ic_action_new_account).getItemId();
+        Log.d(TAG, "add_server_item: " + add_server_item);
+        // Pointless adding of drawable (which will not show up) to get the menu item to be drawn
+        serverMenu.setIcon(R.drawable.ic_action_accounts);
+        about_item = menu.add(2,order+1,Menu.NONE,"About").setIcon(R.drawable.ic_action_about).getItemId();
+        Log.d(TAG,"about_item: "+ about_item);
     }
 
     @Override
@@ -185,6 +323,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onPause() {
         Log.d(TAG, "--> onPause called");
+        mBroadcastMgr.unregisterReceiver(tokenReceiver);
         super.onPause();
     }
 
@@ -195,75 +334,15 @@ public class MainActivity extends AppCompatActivity implements
         super.onDestroy();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.action_about) {
-
-            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-            alertDialog.setTitle("Developed at The Hyve");
-
-            PackageInfo pInfo = null;
-            try {
-                pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
-            assert pInfo != null;
-            String versionName = pInfo.versionName;
-            int versionCode = pInfo.versionCode;
-
-            final TextView message = new TextView(this);
-            message.setMovementMethod(LinkMovementMethod.getInstance());
-
-            SpannableString s = new SpannableString(
-                    "Version "+versionName+" (version code "+versionCode+")\n" +
-                            "\n" +
-                            "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
-                            "\n" +
-                            "This code is licensed under the GNU Lesser General Public License, " +
-                            "version 3, or (at your option) any later version.\n" +
-                            "\n" +
-                            "Contribute at https://github.com/wardweistra/tranSMARTClient"
-                    );
-            Linkify.addLinks(s, Linkify.WEB_URLS);
-            message.setText(s);
-            alertDialog.setView(message,30,30,30,30);
-            alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
-            // Set the Icon for the Dialog
-            alertDialog.setIcon(R.drawable.thehyve);
-            alertDialog.show();
-
-            return true;
-        } else if (id == R.id.action_addNewServer) {
-            Fragment fragment = new AddNewServerFragment();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
-                    .addToBackStack("AddNewServerFragment")
-                    .commit();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
     // This is the method that is called when the submit button is clicked
 
     public void checkTransmartServerUrl(View view) {
         EditText serverUrlEditText = (EditText) findViewById(R.id.serverUrlField);
-        String serverUrl = serverUrlEditText.getText().toString();
+        EditText serverLabelField  = (EditText) findViewById(R.id.serverLabelField);
+
+        String serverUrl   = serverUrlEditText.getText().toString();
+        String serverLabel = serverLabelField.getText().toString();
+        Log.d(TAG,"serverLabel: "+serverLabel);
 
         if (serverUrl.equals("")) {
             TextInputLayout inputServerUrl = (TextInputLayout) findViewById(R.id.input_server_url);
@@ -274,11 +353,14 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(TAG, "Scheme: " + Uri.parse(serverUrl).getScheme());
         if (Uri.parse(serverUrl).getScheme()==null){
             serverUrl = "https://" + serverUrl;
-
         }
 
         try {
-            new URL(serverUrl);
+            URL url = new URL(serverUrl);
+            if (serverLabel.equals("")) {
+                serverLabel = url.getPath();
+                Log.d(TAG, "Set serverLabel to "+serverLabel);
+            }
         } catch (MalformedURLException e) {
             TextInputLayout inputServerUrl = (TextInputLayout) findViewById(R.id.input_server_url);
             inputServerUrl.setError(getString(R.string.malformed_url));
@@ -290,12 +372,10 @@ public class MainActivity extends AppCompatActivity implements
             Log.d(TAG,"Removed trailing /: "+serverUrl);
         }
 
-        connectToTranSMARTServer(serverUrl);
+        connectToTranSMARTServer(serverUrl, serverLabel);
     }
 
-    public void connectToTranSMARTServer(String serverUrl) {
-
-
+    public void connectToTranSMARTServer(String serverUrl, String serverLabel) {
 
         String query = serverUrl + "/oauth/authorize?"
                 + "response_type=code"
@@ -308,8 +388,10 @@ public class MainActivity extends AppCompatActivity implements
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("currentServerUrl", serverUrl);
+        editor.putString("currentServerLabel", serverLabel);
         editor.putBoolean("oauthCodeUsed", false);
         Log.d(TAG, "Saved currentServerUrl in to settings: " + serverUrl);
+        Log.d(TAG, "Saved currentServerLabel in to settings: " + serverLabel);
 
         Log.d(TAG, "Opening URL: " + query);
 
@@ -344,6 +426,9 @@ public class MainActivity extends AppCompatActivity implements
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+
+            transmartServers.add(transmartServer);
+            refreshNavigationMenu();
 
             Fragment fragment = new ServerOverviewFragment();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
@@ -381,7 +466,7 @@ public class MainActivity extends AppCompatActivity implements
         alertDialog.setView(message, 30, 30, 30, 30);
         alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Reconnect", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                connectToTranSMARTServer(transmartServer.getServerUrl());
+                connectToTranSMARTServer(transmartServer.getServerUrl(), transmartServer.getServerLabel());
             }
         });
         alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Try again", new DialogInterface.OnClickListener() {

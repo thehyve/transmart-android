@@ -19,6 +19,7 @@
     <string name="studyOverviewIntro">Below are the studies in this tranSMART server.</string>
 
     <!-- Menu items -->
+    <string name="contentDescriptionHeader">TranSMART Client header image</string>
     <string name="action_addNewServer">New Server</string>
     <string name="action_about">About</string>
 

@@ -17,14 +17,15 @@ public class TransmartServer implements Parcelable {
     String serverUrl;
     String access_token;
     String refresh_token;
-    String prettyName;
+    String serverLabel;
+    Integer menuItemID;
 
     // Standard basic constructor for non-parcel object creation
     public TransmartServer() {
         this.serverUrl = "";
         this.access_token = "";
         this.refresh_token = "";
-        this.prettyName = "";
+        this.serverLabel = "";
         Log.d(TAG, "transmartServer has been instantiated from scratch.");
     }
     // Constructor to use when re-constructing object from a parcel
@@ -39,7 +40,7 @@ public class TransmartServer implements Parcelable {
         out.writeString(serverUrl);
         out.writeString(access_token);
         out.writeString(refresh_token);
-        out.writeString(prettyName);
+        out.writeString(serverLabel);
 
         Log.d(TAG, "transmartServer has been written to parcel.");
         Log.d(TAG, "Server URL: "+ serverUrl);
@@ -50,7 +51,7 @@ public class TransmartServer implements Parcelable {
         this.serverUrl = in.readString();
         this.access_token = in.readString();
         this.refresh_token = in.readString();
-        this.prettyName = in.readString();
+        this.serverLabel = in.readString();
 
         Log.d(TAG, "transmartServer has been read from parcel.");
         Log.d(TAG, "Server URL: "+ serverUrl);
@@ -67,6 +68,12 @@ public class TransmartServer implements Parcelable {
         Log.d(TAG,"Asked for serverUrl: " + serverUrl);
         return serverUrl;
     }
+    public String getServerLabel() {
+        return serverLabel;
+    }
+    public Integer getMenuItemID() {
+        return menuItemID;
+    }
 
     // Setters
     public void setAccess_token(String access_token) {
@@ -79,6 +86,13 @@ public class TransmartServer implements Parcelable {
         this.serverUrl = serverUrl;
         Log.d(TAG,"Set serverUrl to " + serverUrl);
     }
+    public void setServerLabel(String serverLabel) {
+        this.serverLabel = serverLabel;
+    }
+    public void setMenuItemID(Integer menuItemID) {
+        this.menuItemID = menuItemID;
+    }
+
 
     // Other obligatory stuff for Parcelable
 

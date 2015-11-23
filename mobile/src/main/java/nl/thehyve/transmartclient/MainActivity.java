@@ -33,10 +33,23 @@ import android.widget.EditText;
 import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import android.support.v4.app.Fragment;
 
@@ -76,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements
     private android.support.v4.app.FragmentManager fragmentManager;
 
     Integer about_item, add_server_item;
+
+    private final static String serversFileName = "servers.txt";
+    Gson gson = new Gson();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -227,8 +243,44 @@ public class MainActivity extends AppCompatActivity implements
 
         if (savedInstanceState == null) {
             Log.d(TAG, "savedInstanceState is null");
-            Fragment fragment = new AddNewServerFragment();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+
+            final Menu menu = mNavigationView.getMenu();
+
+//            Read transmartServers from file
+            try {
+                FileInputStream fis = openFileInput(serversFileName);
+                BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+                String line;
+                Log.d(TAG,"Reading from "+serversFileName);
+                line = br.readLine();
+                Type listType = new TypeToken<ArrayList<TransmartServer>>() {}.getType();
+                transmartServers = gson.fromJson(line,listType);
+                br.close();
+
+                refreshNavigationMenu();
+
+                if (transmartServers.size() > 0) {
+                    Log.d(TAG, "Restored transmartServers");
+
+                    transmartServer = transmartServers.get(0);
+                    Log.d(TAG, "Setting menu item "+transmartServer.getMenuItemID()+" to checked");
+                    menu.findItem(transmartServer.getMenuItemID()).setChecked(true);
+                    Fragment fragment = new ServerOverviewFragment();
+                    fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                            .addToBackStack("ServerOverviewFragment")
+                            .commit();
+                } else {
+                    throw new Error("transmartServers from file resulted in 0 servers");
+                }
+
+            } catch (IOException e) {
+                Log.i(TAG, "IOException");
+
+                Log.d(TAG, "Setting menu item " + add_server_item + " to checked");
+                menu.findItem(add_server_item).setChecked(true);
+                Fragment fragment = new AddNewServerFragment();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            }
         }
 
         mBroadcastMgr = LocalBroadcastManager
@@ -239,28 +291,34 @@ public class MainActivity extends AppCompatActivity implements
 
     private void refreshNavigationMenu() {
 
+
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         final Menu menu = mNavigationView.getMenu();
 
         menu.clear();
 
-        SubMenu serverMenu = menu.addSubMenu(1,1,Menu.NONE,"Servers");
-        serverMenu.setGroupCheckable(2,true,true);
-        Integer order = 2;
+        Integer order = 0;
+        Integer group = 1;
+
+        SubMenu serverMenu = menu.addSubMenu(Menu.NONE, order, order, "Servers");
+        order += 1;
+
         Log.d(TAG,"Number of servers connected for menu: "+transmartServers.size());
-        for (TransmartServer transmartServer : transmartServers) {
-            Integer menuItemID = serverMenu.add(2, order, Menu.NONE, transmartServer.getServerLabel())
+        for (TransmartServer menuTransmartServer : transmartServers) {
+            Integer menuItemID = serverMenu.add(group, order, order, menuTransmartServer.getServerLabel())
                     .setIcon(R.drawable.ic_action_accounts)
                     .getItemId();
-            transmartServer.setMenuItemID(menuItemID);
+            menuTransmartServer.setMenuItemID(menuItemID);
             order += 1;
         }
-        add_server_item = serverMenu.add(2,order,Menu.NONE,"Add server").setIcon(R.drawable.ic_action_new_account).getItemId();
+        add_server_item = serverMenu.add(group,order,order,"Add server").setIcon(R.drawable.ic_action_new_account).getItemId();
+        order += 1;
         Log.d(TAG, "add_server_item: " + add_server_item);
-        // Pointless adding of drawable (which will not show up) to get the menu item to be drawn
-        serverMenu.setIcon(R.drawable.ic_action_accounts);
-        about_item = menu.add(2,order+1,Menu.NONE,"About").setIcon(R.drawable.ic_action_about).getItemId();
-        Log.d(TAG,"about_item: "+ about_item);
+
+        serverMenu.setGroupCheckable(group, true, true);
+
+        about_item = menu.add(Menu.NONE,order,order,"About").setIcon(R.drawable.ic_action_about).getItemId();
+        Log.d(TAG, "about_item: " + about_item);
     }
 
     @Override
@@ -329,6 +387,22 @@ public class MainActivity extends AppCompatActivity implements
     protected void onDestroy() {
         Log.d(TAG, "--> onDestroy called");
         mBroadcastMgr.unregisterReceiver(tokenReceiver);
+
+//      Save transmartServers to file
+        if (transmartServers.size()>0) {
+            Log.d(TAG, "Writing: " + gson.toJson(transmartServers));
+            try {
+                FileOutputStream fos;
+                fos = openFileOutput(serversFileName, MODE_MULTI_PROCESS);
+                PrintWriter pw = new PrintWriter(new BufferedWriter(
+                        new OutputStreamWriter(fos)));
+                pw.println(gson.toJson(transmartServers));
+                pw.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
         super.onDestroy();
     }
 
@@ -427,6 +501,11 @@ public class MainActivity extends AppCompatActivity implements
 
             transmartServers.add(transmartServer);
             refreshNavigationMenu();
+            NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+            final Menu menu = mNavigationView.getMenu();
+
+            Log.d(TAG, "Setting menu item "+transmartServer.getMenuItemID()+" to checked");
+            menu.findItem(transmartServer.getMenuItemID()).setChecked(true);
 
             Fragment fragment = new ServerOverviewFragment();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)

@@ -4,6 +4,16 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
+
 /**
  * Created by Ward Weistra on 22-12-14.
  * Copyright (c) 2015 The Hyve B.V.
@@ -94,5 +104,49 @@ public class ServerResult implements Parcelable {
         this.result = in.readString();
 
         Log.d(TAG, "ServerResult has been read from parcel.");
+    }
+
+    public ServerResult getServerResult(String access_token, String query) {
+        URL url;
+        String responseLine;
+        StringBuilder responseBuilder = new StringBuilder();
+        String queryResult;
+
+        try {
+            url = new URL(query);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            if (access_token != null) urlConnection.addRequestProperty("Authorization", "Bearer " + access_token);
+
+            int statusCode = urlConnection.getResponseCode();
+            String statusDescription = urlConnection.getResponseMessage();
+            setResponseCode(statusCode);
+            setResponseDescription(statusDescription);
+
+            if (statusCode != 200) {
+                return this;
+            }
+
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(in));
+
+            while ((responseLine = bufferedReader.readLine()) != null) {
+                responseBuilder.append(responseLine);
+            }
+            queryResult = responseBuilder.toString();
+            setResult(queryResult);
+            Log.i(TAG, "Response : " + queryResult);
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e){
+            setResponseCode(0);
+            setResponseDescription("Make sure that your internet connection " +
+                    "is still working.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return this;
     }
 }

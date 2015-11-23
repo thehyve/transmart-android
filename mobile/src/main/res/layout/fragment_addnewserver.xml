@@ -82,8 +82,7 @@
             android:layout_weight="1"
             android:singleLine="true"
             android:text="@string/urlExample"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/common_signin_btn_light_text_default" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
     </LinearLayout>
 

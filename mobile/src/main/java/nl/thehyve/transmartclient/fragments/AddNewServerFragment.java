@@ -1,10 +1,17 @@
 package nl.thehyve.transmartclient.fragments;
 
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import nl.thehyve.transmartclient.R;
 
@@ -28,8 +35,31 @@ public class AddNewServerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_addnewserver, container, false);
-
         getActivity().setTitle(R.string.addnewserver);
+
+        final EditText serverUrlEditText = (EditText) rootView.findViewById(R.id.serverUrlField);
+        final EditText serverLabelField = (EditText) rootView.findViewById(R.id.serverLabelField);
+        final Button connect_button = (Button) rootView.findViewById(R.id.connect_button);
+
+        LinearLayout exampleContainer = (LinearLayout) rootView.findViewById(R.id.exampleContainer);
+        exampleContainer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                serverUrlEditText.setText(getString(R.string.urlExample));
+                serverLabelField.setText(getString(R.string.labelExample));
+            }
+        });
+
+        serverLabelField.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_GO) {
+                    connect_button.performClick();
+                    return true;
+                }
+                return false;
+            }
+        });
+
         return rootView;
     }
 }

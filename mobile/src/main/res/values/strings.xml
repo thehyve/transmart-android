@@ -2,18 +2,22 @@
 <resources>
 
     <string name="app_name">TranSMART Client</string>
-    <string name="welcomeText">Welcome, please add your tranSMART server from the menu to start.</string>
     <string name="app__display_name">TranSMART</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Add new server -->
-    <string name="addServerText">Enter your tranSMART address below and give this application permission to access your data.</string>
-    <string name="addServerText2">Feel free to use this example server for testing purposes:</string>
-    <string name="urlExample" translatable="false">http://transmart-demo.thehyve.net/transmart</string>
-    <string name="loginExample">Log in with username \'user\' and password \'user\'.</string>
-    <string name="serverUrl" translatable="false">http://myserver.com/transmart</string>
+    <string name="serverUrl">Link to your tranSMART server</string>
+    <string name="serverLabel">Label (optional)</string>
     <string name="button_submit">Connect</string>
+    <string name="no_server_url_specified">Please enter your tranSMART link first</string>
+    <string name="malformed_url">Please start with http:// or https://</string>
+    <string name="no_app_for_url">No app installed to open %1$s</string>
+    <string name="server_responded_with">Server responded with code %1$s: %2$s</string>
+    <string name="addServerText">Example:</string>
+    <string name="urlExample" translatable="false">http://transmart-demo.thehyve.net/transmart</string>
+    <string name="labelExample">The Hyve Demo</string>
+    <string name="addServerText2">Log in with user and pass \'user\'.</string>
 
     <!-- Server overview -->
     <string name="studyOverviewIntro">Below are the studies in this tranSMART server.</string>
@@ -26,5 +30,9 @@
     <!-- Fragment titles -->
     <string name="serverOverview">Server overview</string>
     <string name="addnewserver">Add a new server</string>
+
+    <string name="info_title">Developed at The Hyve</string>
+
+    <string name="snackbar_ok">OK</string>
 
 </resources>

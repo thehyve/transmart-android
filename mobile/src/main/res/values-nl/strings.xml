@@ -13,8 +13,14 @@
     <string name="info_title">Ontwikkeld door The Hyve</string>
     <string name="labelExample">The Hyve Demo</string>
     <string name="malformed_url">Begin met http:// of https://</string>
-    <string name="no_server_url_specified">Vul eerst je tranSMART link in</string>
+    <string name="no_server_url_specified">Vul eerst je tranSMART URL in</string>
     <string name="serverLabel">Label (optioneel)</string>
-    <string name="serverUrl" translatable="false">De link naar jouw tranSMART server</string>
+    <string name="serverUrl" translatable="false">URL naar jouw tranSMART server</string>
     <string name="contentDescriptionHeader">TranSMART Client header image</string>
+    <string name="check_internet">Controleer of je nog verbonden bent met het internet.</string>
+    <string name="snackbar_ok">OK</string>
+    <string name="no_app_for_url">Geen app geinstalleerd om deze URL te openen</string>
+    <string name="server_responded_with">Server reageerde met code %1$s: %2$s</string>
+    <string name="navigation_drawer_close">Sluit navigatie drawer</string>
+    <string name="navigation_drawer_open">Open navigatie drawer</string>
 </resources>

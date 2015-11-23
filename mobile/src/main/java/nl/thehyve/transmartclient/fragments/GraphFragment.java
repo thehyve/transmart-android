@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
@@ -246,8 +245,7 @@ public class GraphFragment extends Fragment {
 
             } catch (UnknownHostException e){
                 serverResult.setResponseCode(0);
-                serverResult.setResponseDescription("Make sure that your internet connection " +
-                        "is still working.");
+                serverResult.setResponseDescription(getString(R.string.check_internet));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -368,8 +366,7 @@ public class GraphFragment extends Fragment {
 
             } catch (UnknownHostException e){
                 serverResult.setResponseCode(0);
-                serverResult.setResponseDescription("Make sure that your internet connection " +
-                        "is still working.");
+                serverResult.setResponseDescription(getString(R.string.check_internet));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -397,10 +394,15 @@ public class GraphFragment extends Fragment {
                     restInteractionListener.connectionLost();
                 }
             } else {
-                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Server responded with code "
-                        + serverResult.getResponseCode() + ": "
-                        + serverResult.getResponseDescription(), Toast.LENGTH_SHORT);
-                toast.show();
+                String message = String.format(getString(R.string.server_responded_with),
+                        serverResult.getResponseCode(),
+                        serverResult.getResponseDescription());
+                Snackbar.make(rootView, message, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                            }
+                        }).show();
             }
         }
     }

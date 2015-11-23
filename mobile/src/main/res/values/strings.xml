@@ -7,12 +7,12 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <!-- Add new server -->
-    <string name="serverUrl">Link to your tranSMART server</string>
+    <string name="serverUrl">URL to your tranSMART server</string>
     <string name="serverLabel">Label (optional)</string>
     <string name="button_submit">Connect</string>
-    <string name="no_server_url_specified">Please enter your tranSMART link first</string>
+    <string name="no_server_url_specified">Please enter your tranSMART URL first</string>
     <string name="malformed_url">Please start with http:// or https://</string>
-    <string name="no_app_for_url">No app installed to open %1$s</string>
+    <string name="no_app_for_url">No app installed to open this URL</string>
     <string name="server_responded_with">Server responded with code %1$s: %2$s</string>
     <string name="addServerText">Example:</string>
     <string name="urlExample" translatable="false">http://transmart-demo.thehyve.net/transmart</string>
@@ -34,5 +34,6 @@
     <string name="info_title">Developed at The Hyve</string>
 
     <string name="snackbar_ok">OK</string>
+    <string name="check_internet">Make sure that your internet connection is still working.</string>
 
 </resources>

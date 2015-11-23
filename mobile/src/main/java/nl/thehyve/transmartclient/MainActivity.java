@@ -111,9 +111,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG,"menuItem ID: "+ menuItemId);
 
                 if (!menuItemId.equals(about_item)) {
-                    //Checking if the item is in checked state or not, if not make it in checked state
-                    if (menuItem.isChecked()) menuItem.setChecked(false);
-                    else menuItem.setChecked(true);
+                    menuItem.setChecked(true);
 
                     //Closing drawer on item click
                     drawer.closeDrawers();

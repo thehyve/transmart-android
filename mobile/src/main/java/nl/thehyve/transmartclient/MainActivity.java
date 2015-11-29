@@ -262,11 +262,11 @@ public class MainActivity extends AppCompatActivity implements
 
                     transmartServer = transmartServers.get(0);
                     Log.d(TAG, "Setting menu item "+transmartServer.getMenuItemID()+" to checked");
-                    menu.findItem(transmartServer.getMenuItemID()).setChecked(true);
                     Fragment fragment = new ServerOverviewFragment();
                     fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
                             .addToBackStack("ServerOverviewFragment")
                             .commit();
+                        mNavigationView.setCheckedItem(transmartServer.getMenuItemID());
                 } else {
                     throw new Error("transmartServers from file resulted in 0 servers");
                 }
@@ -275,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements
                 Log.i(TAG, "IOException");
 
                 Log.d(TAG, "Setting menu item " + add_server_item + " to checked");
-                menu.findItem(add_server_item).setChecked(true);
+                mNavigationView.setCheckedItem(add_server_item);
                 Fragment fragment = new AddNewServerFragment();
                 fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
             }
@@ -506,8 +506,8 @@ public class MainActivity extends AppCompatActivity implements
             NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
             final Menu menu = mNavigationView.getMenu();
 
-            Log.d(TAG, "Setting menu item "+transmartServer.getMenuItemID()+" to checked");
-            menu.findItem(transmartServer.getMenuItemID()).setChecked(true);
+            Log.d(TAG, "Setting menu item " + transmartServer.getMenuItemID() + " to checked");
+            mNavigationView.setCheckedItem(transmartServer.getMenuItemID());
 
             Fragment fragment = new ServerOverviewFragment();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)

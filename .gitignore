@@ -6,3 +6,4 @@
 /build
 *.apk
 manifest-merger-release-report.txt
+ward.xml

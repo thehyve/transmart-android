@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 Integer menuItemId = menuItem.getItemId();
-                Log.d(TAG,"menuItem ID: "+ menuItemId);
+                Log.d(TAG,"Clicked on menuItem ID: "+ menuItemId);
 
                 if (!menuItemId.equals(about_item)) {
                     menuItem.setChecked(true);
@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 //Check to see which item was being clicked and perform appropriate action
                 if (menuItemId.equals(about_item)) {
-                    Log.d(TAG,"about_item: "+ about_item);
+                    Log.d(TAG,"Clicked about_item: "+ about_item);
                     AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                     alertDialog.setTitle(R.string.info_title);
 
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements
 
                     return true;
                 } else if (menuItemId.equals(add_server_item)) {
-                    Log.d(TAG,"add_server_item: "+ add_server_item);
+                    Log.d(TAG,"Clicked add_server_item: "+ add_server_item);
 
                     Fragment fragment = new AddNewServerFragment();
                     fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
@@ -185,9 +185,9 @@ public class MainActivity extends AppCompatActivity implements
                 } else {
 
                     for (TransmartServer transmartServerItem : transmartServers){
-                        Log.d(TAG,"transmartServerItem ID: "+ transmartServerItem.getMenuItemID());
 
                         if (menuItemId.equals(transmartServerItem.getMenuItemID())) {
+                            Log.d(TAG,"Clicked transmartServerItem ID: "+ transmartServerItem.getMenuItemID());
                             transmartServer = transmartServerItem;
                             Fragment fragment = new ServerOverviewFragment();
                             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
@@ -209,10 +209,8 @@ public class MainActivity extends AppCompatActivity implements
 //        When the activity is started from the OAuth return URL: Get the code out
         Intent intent = getIntent();
         Uri uri = intent.getData();
-        Log.d(TAG,"uri: "+uri);
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         boolean oauthCodeUsed = settings.getBoolean("oauthCodeUsed", false);
-        Log.d(TAG,"oauthCodeUsed: "+oauthCodeUsed);
         if (
                 uri != null
                 && uri.toString().startsWith("transmart://oauthresponse")
@@ -305,6 +303,7 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d(TAG,"Number of servers connected for menu: "+transmartServers.size());
         for (TransmartServer menuTransmartServer : transmartServers) {
+            Log.d(TAG,"Added server label: "+menuTransmartServer.getServerLabel()+". ("+menuTransmartServer+")");
             Integer menuItemID = serverMenu.add(group, order, order, menuTransmartServer.getServerLabel())
                     .setIcon(R.drawable.ic_action_accounts)
                     .getItemId();
@@ -313,12 +312,12 @@ public class MainActivity extends AppCompatActivity implements
         }
         add_server_item = serverMenu.add(group,order,order,"Add server").setIcon(R.drawable.ic_action_new_account).getItemId();
         order += 1;
-        Log.d(TAG, "add_server_item: " + add_server_item);
+        Log.d(TAG, "Added add_server_item: " + add_server_item);
 
         serverMenu.setGroupCheckable(group, true, true);
 
         about_item = menu.add(Menu.NONE,order,order,"About").setIcon(R.drawable.ic_action_about).getItemId();
-        Log.d(TAG, "about_item: " + about_item);
+        Log.d(TAG, "Added about_item: " + about_item);
     }
 
     @Override
@@ -414,7 +413,7 @@ public class MainActivity extends AppCompatActivity implements
 
         String serverUrl   = serverUrlEditText.getText().toString();
         String serverLabel = serverLabelField.getText().toString();
-        Log.d(TAG,"serverLabel: "+serverLabel);
+        Log.d(TAG,"Checking serverLabel: "+serverLabel);
 
         if (serverUrl.equals("")) {
             TextInputLayout inputServerUrl = (TextInputLayout) findViewById(R.id.input_server_url);
@@ -448,6 +447,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void connectToTranSMARTServer(String serverUrl, String serverLabel) {
+        Log.d(TAG,"Connecting to transmart server: "+ serverLabel);
 
         String query = serverUrl + "/oauth/authorize?"
                 + "response_type=code"
@@ -486,6 +486,8 @@ public class MainActivity extends AppCompatActivity implements
     public void onTokenReceived(ServerResult serverResult) {
         if (serverResult.getResponseCode() == 200) {
             String access_token;
+
+            Log.d(TAG,"Received token, going to add it to server: "+ transmartServer.getServerLabel());
 
             try {
                 JSONObject jObject = new JSONObject(serverResult.getResult());

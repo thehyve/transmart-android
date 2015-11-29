@@ -43,7 +43,8 @@ public class TransmartServer implements Parcelable {
         out.writeString(serverLabel);
 
         Log.d(TAG, "transmartServer has been written to parcel.");
-        Log.d(TAG, "Server URL: "+ serverUrl);
+        Log.d(TAG, "Server URL: " + serverUrl);
+        Log.d(TAG, "Server label: "+ serverLabel);
     }
 
     // Method to read the data from a Parcel
@@ -55,6 +56,7 @@ public class TransmartServer implements Parcelable {
 
         Log.d(TAG, "transmartServer has been read from parcel.");
         Log.d(TAG, "Server URL: "+ serverUrl);
+        Log.d(TAG, "Server label: "+ serverLabel);
     }
 
     // Getters
@@ -88,6 +90,7 @@ public class TransmartServer implements Parcelable {
     }
     public void setServerLabel(String serverLabel) {
         this.serverLabel = serverLabel;
+        Log.d(TAG, "Server label: "+ serverLabel);
     }
     public void setMenuItemID(Integer menuItemID) {
         this.menuItemID = menuItemID;

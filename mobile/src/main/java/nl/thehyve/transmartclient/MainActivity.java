@@ -211,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements
         Uri uri = intent.getData();
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         boolean oauthCodeUsed = settings.getBoolean("oauthCodeUsed", false);
+        boolean receivedURI = false;
+
         if (
                 uri != null
                 && uri.toString().startsWith("transmart://oauthresponse")
@@ -237,6 +239,7 @@ public class MainActivity extends AppCompatActivity implements
             editor.apply();
 
             new TokenGetterTask(this.getApplicationContext(), transmartServer, CLIENT_ID, CLIENT_SECRET).execute(code);
+            receivedURI = true;
         }
 
         if (savedInstanceState == null) {
@@ -260,13 +263,18 @@ public class MainActivity extends AppCompatActivity implements
                 if (transmartServers.size() > 0) {
                     Log.d(TAG, "Restored transmartServers");
 
-                    transmartServer = transmartServers.get(0);
-                    Log.d(TAG, "Setting menu item "+transmartServer.getMenuItemID()+" to checked");
-                    Fragment fragment = new ServerOverviewFragment();
-                    fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
-                            .addToBackStack("ServerOverviewFragment")
-                            .commit();
+                    if (!receivedURI) {
+
+                        transmartServer = transmartServers.get(0);
+                        Log.d(TAG, "Setting menu item " + transmartServer.getMenuItemID() + " to checked");
+
                         mNavigationView.setCheckedItem(transmartServer.getMenuItemID());
+                        Fragment fragment = new ServerOverviewFragment();
+                        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                                .addToBackStack("ServerOverviewFragment")
+                                .commit();
+                    }
+
                 } else {
                     throw new Error("transmartServers from file resulted in 0 servers");
                 }

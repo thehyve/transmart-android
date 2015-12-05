@@ -1,6 +1,7 @@
 package nl.thehyve.transmartclient.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,14 +14,17 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 
 import nl.thehyve.transmartclient.MainActivity;
 import nl.thehyve.transmartclient.R;
+import nl.thehyve.transmartclient.apiItems.Study;
 import nl.thehyve.transmartclient.rest.RestInteractionListener;
 import nl.thehyve.transmartclient.rest.ServerResult;
 
@@ -37,6 +41,8 @@ public class ServerOverviewFragment extends Fragment implements ListView.OnItemC
     private RestInteractionListener restInteractionListener;
     private ArrayAdapter mAdapter;
     private ArrayList<String> studyList;
+
+    Gson gson = new Gson();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,13 +77,13 @@ public class ServerOverviewFragment extends Fragment implements ListView.OnItemC
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
-            restInteractionListener = (RestInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) context;
+            restInteractionListener = (RestInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener" +
                     " and RestInteractionListener");
         }
@@ -123,25 +129,35 @@ public class ServerOverviewFragment extends Fragment implements ListView.OnItemC
             super.onPostExecute(serverResult);
 
             if (serverResult.getResponseCode() == 200) {
+                JsonParser parser = new JsonParser();
+                JsonArray jArray;
                 try {
-                    JSONArray jArray = new JSONArray(serverResult.getResult());
-                    Log.i(TAG, jArray.toString());
-
-                    studyList.clear();
-
-                    for (int i = 0; i < jArray.length(); i++) {
-                        JSONObject study = jArray.getJSONObject(i);
-                        String studyId = study.getString("id");
-                        Log.i(TAG, "Study: " + studyId);
-                        studyList.add(studyId);
+                    // Return for newer APIs should be a JsonObject with a studies JsonArray in it
+                    JsonObject json = (JsonObject) parser.parse(serverResult.getResult());
+                    jArray = json.get("studies").getAsJsonArray();
+                } catch (java.lang.ClassCastException e1){
+                    try {
+                        // Return for older APIs should be a JsonArray directly
+                        jArray = (JsonArray) parser.parse(serverResult.getResult());
+                    } catch (java.lang.ClassCastException e2){
+                        throw new ClassCastException("Studies call doesn't return JsonObject or JsonArray");
                     }
-
-                    mAdapter.notifyDataSetChanged();
-
-                } catch (JSONException e) {
-                    Log.i(TAG, "Couldn't parse to JSON: " + serverResult.getResult());
-                    e.printStackTrace();
                 }
+
+                Log.i(TAG, jArray.toString());
+
+                studyList.clear();
+
+                for (int i = 0; i < jArray.size(); i++) {
+                    JsonElement studyJSON = jArray.get(i);
+                    Study study = gson.fromJson(studyJSON, Study.class);
+                    String studyId = study.getId();
+                    String studyName = study.getOntologyTerm().getName();
+                    Log.i(TAG, "Study: " + studyName + " (" + studyId + ")");
+                    studyList.add(studyId);
+                }
+
+                mAdapter.notifyDataSetChanged();
             } else if (serverResult.getResponseCode() == 401) {
                 if (restInteractionListener != null) {
                     restInteractionListener.authorizationLost();

@@ -118,91 +118,7 @@ public class MainActivity extends AppCompatActivity implements
 
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
-            // This method will trigger on item Click of navigation menu
-            @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
-                Integer menuItemId = menuItem.getItemId();
-                Log.d(TAG,"Clicked on menuItem ID: "+ menuItemId);
-
-                if (!menuItemId.equals(about_item)) {
-                    menuItem.setChecked(true);
-
-                    //Closing drawer on item click
-                    drawer.closeDrawers();
-                }
-
-                //Check to see which item was being clicked and perform appropriate action
-                if (menuItemId.equals(about_item)) {
-                    Log.d(TAG,"Clicked about_item: "+ about_item);
-                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                    alertDialog.setTitle(R.string.info_title);
-
-                    PackageInfo pInfo = null;
-                    try {
-                        pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-                    } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                    assert pInfo != null;
-                    String versionName = pInfo.versionName;
-                    int versionCode = pInfo.versionCode;
-
-                    final TextView message = new TextView(MainActivity.this);
-                    message.setMovementMethod(LinkMovementMethod.getInstance());
-
-                    SpannableString s = new SpannableString(
-                            "Version " + versionName + " (version code " + versionCode + ")\n" +
-                                    "\n" +
-                                    "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
-                                    "\n" +
-                                    "This code is licensed under the GNU Lesser General Public License, " +
-                                    "version 3, or (at your option) any later version.\n" +
-                                    "\n" +
-                                    "Contribute at https://github.com/wardweistra/tranSMARTClient"
-                    );
-                    Linkify.addLinks(s, Linkify.WEB_URLS);
-                    message.setText(s);
-                    alertDialog.setView(message, 30, 30, 30, 30);
-                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                        }
-                    });
-                    // Set the Icon for the Dialog
-                    alertDialog.setIcon(R.drawable.thehyve);
-                    alertDialog.show();
-
-                    return true;
-                } else if (menuItemId.equals(add_server_item)) {
-                    Log.d(TAG,"Clicked add_server_item: "+ add_server_item);
-
-                    Fragment fragment = new AddNewServerFragment();
-                    fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
-                            .addToBackStack("AddNewServerFragment")
-                            .commit();
-                    return true;
-                } else {
-
-                    for (TransmartServer transmartServerItem : transmartServers){
-
-                        if (menuItemId.equals(transmartServerItem.getMenuItemID())) {
-                            Log.d(TAG,"Clicked transmartServerItem ID: "+ transmartServerItem.getMenuItemID());
-                            transmartServer = transmartServerItem;
-                            Fragment fragment = new ServerOverviewFragment();
-                            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
-                                    .addToBackStack("ServerOverviewFragment")
-                                    .commit();
-                            return true;
-                        }
-                    }
-
-                    return true;
-                }
-
-            }
-        });
-
+        mNavigationView.setNavigationItemSelectedListener(new OnTransmartNavigationItemSelectedListener(drawer));
 
         fragmentManager = getSupportFragmentManager();
 
@@ -293,6 +209,97 @@ public class MainActivity extends AppCompatActivity implements
                 .getInstance(getApplicationContext());
         tokenReceiver.setTokenReceivedListener(this);
         mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
+    }
+
+    private class OnTransmartNavigationItemSelectedListener implements NavigationView.OnNavigationItemSelectedListener {
+
+        DrawerLayout drawer;
+
+        public OnTransmartNavigationItemSelectedListener(DrawerLayout drawer) {
+            this.drawer = drawer;
+        }
+
+        // This method will trigger on item Click of navigation menu
+        @Override
+        public boolean onNavigationItemSelected(MenuItem menuItem) {
+            Integer menuItemId = menuItem.getItemId();
+            Log.d(TAG,"Clicked on menuItem ID: "+ menuItemId);
+
+            if (!menuItemId.equals(about_item)) {
+                menuItem.setChecked(true);
+
+                //Closing drawer on item click
+                drawer.closeDrawers();
+            }
+
+            //Check to see which item was being clicked and perform appropriate action
+            if (menuItemId.equals(about_item)) {
+                Log.d(TAG,"Clicked about_item: "+ about_item);
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle(R.string.info_title);
+
+                PackageInfo pInfo = null;
+                try {
+                    pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                assert pInfo != null;
+                String versionName = pInfo.versionName;
+                int versionCode = pInfo.versionCode;
+
+                final TextView message = new TextView(MainActivity.this);
+                message.setMovementMethod(LinkMovementMethod.getInstance());
+
+                SpannableString s = new SpannableString(
+                        "Version " + versionName + " (version code " + versionCode + ")\n" +
+                                "\n" +
+                                "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
+                                "\n" +
+                                "This code is licensed under the GNU Lesser General Public License, " +
+                                "version 3, or (at your option) any later version.\n" +
+                                "\n" +
+                                "Contribute at https://github.com/wardweistra/tranSMARTClient"
+                );
+                Linkify.addLinks(s, Linkify.WEB_URLS);
+                message.setText(s);
+                alertDialog.setView(message, 30, 30, 30, 30);
+                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                // Set the Icon for the Dialog
+                alertDialog.setIcon(R.drawable.thehyve);
+                alertDialog.show();
+
+                return true;
+            } else if (menuItemId.equals(add_server_item)) {
+                Log.d(TAG,"Clicked add_server_item: "+ add_server_item);
+
+                Fragment fragment = new AddNewServerFragment();
+                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                        .addToBackStack("AddNewServerFragment")
+                        .commit();
+                return true;
+            } else {
+
+                for (TransmartServer transmartServerItem : transmartServers){
+
+                    if (menuItemId.equals(transmartServerItem.getMenuItemID())) {
+                        Log.d(TAG,"Clicked transmartServerItem ID: "+ transmartServerItem.getMenuItemID());
+                        transmartServer = transmartServerItem;
+                        Fragment fragment = new ServerOverviewFragment();
+                        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                                .addToBackStack("ServerOverviewFragment")
+                                .commit();
+                        return true;
+                    }
+                }
+
+                return true;
+            }
+
+        }
     }
 
     private void refreshNavigationMenu() {

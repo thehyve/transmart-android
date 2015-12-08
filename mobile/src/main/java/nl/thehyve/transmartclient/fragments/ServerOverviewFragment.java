@@ -1,17 +1,16 @@
 package nl.thehyve.transmartclient.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -35,12 +34,13 @@ import nl.thehyve.transmartclient.rest.ServerResult;
  * version 3, or (at your option) any later version.
  */
 
-public class ServerOverviewFragment extends Fragment implements ListView.OnItemClickListener {
+public class ServerOverviewFragment extends Fragment {
     private static final String TAG = "ServerOverviewFragment";
     private OnFragmentInteractionListener mListener;
     private RestInteractionListener restInteractionListener;
-    private ArrayAdapter mAdapter;
-    private ArrayList<String> studyList;
+    private ArrayList<Study> studyList;
+
+    private RecyclerView.Adapter mAdapter;
 
     Gson gson = new Gson();
 
@@ -50,8 +50,7 @@ public class ServerOverviewFragment extends Fragment implements ListView.OnItemC
         setRetainInstance(true);
 
         studyList = new ArrayList<>();
-        mAdapter = new ArrayAdapter<>(getActivity(),
-                R.layout.study_item, R.id.studyName, studyList);
+        mAdapter = new ServerListAdapter(studyList);
 
         // start StudiesGetter here?
     }
@@ -62,11 +61,12 @@ public class ServerOverviewFragment extends Fragment implements ListView.OnItemC
         View rootView = inflater.inflate(R.layout.fragment_serveroverview, container, false);
 
         // Set the adapter
-        ListView mListView = (ListView) rootView.findViewById(R.id.studyList);
-        mListView.setAdapter(mAdapter);
-
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+        RecyclerView mRecyclerView = (RecyclerView) rootView.findViewById(R.id.studyList);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setHasFixedSize(true);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this.getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
 
 //      TODO Show waiting sign: "Retrieving studies"
 
@@ -95,10 +95,50 @@ public class ServerOverviewFragment extends Fragment implements ListView.OnItemC
         mListener = null;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String studyId = (String) parent.getItemAtPosition(position);
-        mListener.onStudyClicked(studyId);
+    public class ServerListAdapter extends RecyclerView.Adapter<ServerListAdapter.ViewHolder> {
+
+        private ArrayList<Study> studyList;
+
+        public ServerListAdapter(ArrayList<Study> studyList) {
+            this.studyList = studyList;
+        }
+
+        @Override
+        public ServerListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.study_item, parent, false);
+            return new ViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(ServerListAdapter.ViewHolder holder, int position) {
+            holder.textStudyName.setText(studyList.get(position).getOntologyTerm().getName());
+            holder.textStudyId.setText("("+studyList.get(position).getId()+")");
+        }
+
+        @Override
+        public int getItemCount() {
+            return studyList.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+            public TextView textStudyName;
+            public TextView textStudyId;
+
+            public ViewHolder(View itemView) {
+                super(itemView);
+                itemView.setClickable(true);
+                itemView.setOnClickListener(this);
+                textStudyName = (TextView) itemView.findViewById(R.id.studyName);
+                textStudyId   = (TextView) itemView.findViewById(R.id.studyId);
+            }
+
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "Clicked position " + getAdapterPosition() + ": " + studyList.get(getAdapterPosition()).getId());
+                mListener.onStudyClicked(studyList.get(getAdapterPosition()).getId());
+            }
+        }
+
     }
 
     public interface OnFragmentInteractionListener {
@@ -154,7 +194,7 @@ public class ServerOverviewFragment extends Fragment implements ListView.OnItemC
                     String studyId = study.getId();
                     String studyName = study.getOntologyTerm().getName();
                     Log.i(TAG, "Study: " + studyName + " (" + studyId + ")");
-                    studyList.add(studyId);
+                    studyList.add(study);
                 }
 
                 mAdapter.notifyDataSetChanged();

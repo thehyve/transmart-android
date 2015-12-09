@@ -23,4 +23,5 @@
     <string name="server_responded_with">Server reageerde met code %1$s: %2$s</string>
     <string name="navigation_drawer_close">Sluit navigatie drawer</string>
     <string name="navigation_drawer_open">Open navigatie drawer</string>
+    <string name="contentDescHelpImage">Help image</string>
 </resources>

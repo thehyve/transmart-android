@@ -8,8 +8,8 @@ android {
         applicationId "nl.thehyve.transmartclient"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 13
-        versionName "0.8.5"
+        versionCode 14
+        versionName "0.8.8"
     }
     buildTypes {
         release {
@@ -25,5 +25,5 @@ dependencies {
     compile 'com.google.android.gms:play-services:8.3.0'
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:design:23.1.1'
-    compile 'com.android.support:recyclerview-v7:22.0.0'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
 }

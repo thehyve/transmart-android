@@ -29,4 +29,12 @@
     <string name="sure_remove_server_text">Are you sure you want to remove this server?</string>
     <string name="sure_remove_server_positive">Verwijder</string>
     <string name="sure_remove_server_negative">Annuleren</string>
+    <string name="connection_lost">Connection lost</string>
+    <string name="connection_lost_text">We seem to be unable to reach the tranSMART server. Please check your internet connection and try again.</string>
+    <string name="connection_lost_positive">Try again</string>
+    <string name="connection_lost_negative">Cancel</string>
+    <string name="authorization_lost">Authorization lost</string>
+    <string name="authorization_lost_text">The tranSMART server seems to have forgotten that you have given this app permission to access your data. Shall we try to reconnect?</string>
+    <string name="authorization_lost_positive">Reconnect</string>
+    <string name="authorization_lost_negative">Try again</string>
 </resources>

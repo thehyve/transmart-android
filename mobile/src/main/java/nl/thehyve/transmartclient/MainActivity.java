@@ -529,51 +529,42 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void authorizationLost() {
-        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-        alertDialog.setTitle("Authorization lost");
-        final TextView message = new TextView(this);
-        SpannableString s = new SpannableString(
-                "The tranSMART server seems to have forgotten that you have given this app permission " +
-                        "to access your data. Shall we try to reconnect?"
-        );
-        message.setText(s);
-        alertDialog.setView(message, 30, 30, 30, 30);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Reconnect", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                connectToTranSMARTServer(transmartServer.getServerUrl(), transmartServer.getServerLabel());
-            }
-        });
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Try again", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                Fragment fragment = new ServerOverviewFragment();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-            }
-        });
-        alertDialog.show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder
+                .setTitle(R.string.authorization_lost)
+                .setMessage(R.string.authorization_lost_text)
+                .setPositiveButton(R.string.authorization_lost_positive, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        connectToTranSMARTServer(transmartServer.getServerUrl(), transmartServer.getServerLabel());
+                    }
+                })
+                .setNegativeButton(R.string.authorization_lost_negative, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Fragment fragment = new ServerOverviewFragment();
+                        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                    }
+                })
+                .show();
     }
 
     @Override
     public void connectionLost() {
-        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-        alertDialog.setTitle("Connection lost");
-        final TextView message = new TextView(this);
-        SpannableString s = new SpannableString(
-                "We seem to be unable to reach the tranSMART server. Please check your internet " +
-                        "connection and try again."
-        );
-        message.setText(s);
-        alertDialog.setView(message, 30, 30, 30, 30);
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Try again", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                Fragment fragment = new ServerOverviewFragment();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-            }
-        });
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-            }
-        });
-        alertDialog.show();
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder
+                .setTitle(R.string.connection_lost)
+                .setMessage(R.string.connection_lost_text)
+                .setPositiveButton(R.string.connection_lost_positive, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Fragment fragment = new ServerOverviewFragment();
+                        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                    }
+                })
+                .setNegativeButton(R.string.connection_lost_negative, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                })
+                .show();
     }
 
     // Methods for ServerOverviewFragment
@@ -588,7 +579,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void removeServer() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder
                 .setTitle(R.string.sure_remove_server)

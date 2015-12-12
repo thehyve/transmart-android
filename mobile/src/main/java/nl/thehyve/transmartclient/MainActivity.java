@@ -274,7 +274,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 return true;
             } else if (menuItemId.equals(add_server_item)) {
-                Log.d(TAG,"Clicked add_server_item: "+ add_server_item);
+                Log.d(TAG, "Clicked add_server_item: " + add_server_item);
 
                 Fragment fragment = new AddNewServerFragment();
                 fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)

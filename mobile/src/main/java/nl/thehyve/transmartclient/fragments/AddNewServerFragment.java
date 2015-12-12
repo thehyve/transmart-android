@@ -1,6 +1,5 @@
 package nl.thehyve.transmartclient.fragments;
 
-import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.KeyEvent;

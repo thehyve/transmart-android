@@ -8,6 +8,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -48,6 +51,7 @@ public class ServerOverviewFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        setHasOptionsMenu(true);
 
         studyList = new ArrayList<>();
         mAdapter = new ServerListAdapter(studyList);
@@ -74,6 +78,26 @@ public class ServerOverviewFragment extends Fragment {
 
         getActivity().setTitle(R.string.serverOverview);
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.server_overview_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_removeServer:
+                Log.d(TAG,"Remove server");
+                mListener.removeServer();
+                return true;
+            default:
+                break;
+        }
+
+        return false;
     }
 
     @Override
@@ -143,6 +167,7 @@ public class ServerOverviewFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onStudyClicked(String studyId);
+        void removeServer();
     }
 
     private class StudiesGetter extends AsyncTask<Void, Void, ServerResult> {

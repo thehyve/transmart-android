@@ -15,7 +15,7 @@
     <string name="malformed_url">Begin met http:// of https://</string>
     <string name="no_server_url_specified">Vul eerst je tranSMART URL in</string>
     <string name="serverLabel">Label (optioneel)</string>
-    <string name="serverUrl" translatable="false">URL naar jouw tranSMART server</string>
+    <string name="serverUrl">URL naar jouw tranSMART server</string>
     <string name="contentDescriptionHeader">TranSMART Client header image</string>
     <string name="check_internet">Controleer of je nog verbonden bent met het internet.</string>
     <string name="snackbar_ok">OK</string>
@@ -23,5 +23,10 @@
     <string name="server_responded_with">Server reageerde met code %1$s: %2$s</string>
     <string name="navigation_drawer_close">Sluit navigatie drawer</string>
     <string name="navigation_drawer_open">Open navigatie drawer</string>
-    <string name="contentDescHelpImage">Help image</string>
+    <string name="contentDescHelpImage">Help plaatje</string>
+    <string name="action_removeServer">Verwijder server</string>
+    <string name="sure_remove_server">Server verwijderen?</string>
+    <string name="sure_remove_server_text">Are you sure you want to remove this server?</string>
+    <string name="sure_remove_server_positive">Verwijder</string>
+    <string name="sure_remove_server_negative">Annuleren</string>
 </resources>

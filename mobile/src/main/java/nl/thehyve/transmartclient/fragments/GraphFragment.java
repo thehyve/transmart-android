@@ -2,7 +2,6 @@ package nl.thehyve.transmartclient.fragments;
 
 import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -133,6 +132,7 @@ public class GraphFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         getActivity().setTitle(studyId);
+        mListener.setToggleState(false);
 
         rootView = inflater.inflate(R.layout.fragment_graph, container, false);
 
@@ -141,13 +141,6 @@ public class GraphFragment extends Fragment {
 
         // Inflate the layout for this fragment
         return rootView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
@@ -169,6 +162,12 @@ public class GraphFragment extends Fragment {
         mListener = null;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mListener.setToggleState(true);
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -180,8 +179,7 @@ public class GraphFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(Uri uri);
+        void setToggleState(boolean isEnabled);
     }
 
     private class ConceptsGetter extends AsyncTask<Void, Void, ServerResult> {

@@ -1,5 +1,6 @@
 package nl.thehyve.transmartclient;
 
+import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -28,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -85,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements
     public static List<TransmartServer> transmartServers = new ArrayList<>();
     public static TransmartServer transmartServer;
     private CoordinatorLayout coordinatorLayout;
+    private DrawerLayout drawer;
+    private ActionBarDrawerToggle toggle;
     private LocalBroadcastManager mBroadcastMgr;
     private android.support.v4.app.FragmentManager fragmentManager;
 
@@ -101,12 +105,17 @@ public class MainActivity extends AppCompatActivity implements
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        
+        assert getSupportActionBar() != null;
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinator_layout);
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_view);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-            public void onDrawerOpened(View drawerView) {
+        drawer = (DrawerLayout) findViewById(R.id.main_view);
+        toggle = new ActionBarDrawerToggle(
+                this, drawer, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+            public void onDrawerOpened(View drawerView)
+            {
                 super.onDrawerOpened(drawerView);
                 hideKeyboard();
             }
@@ -209,6 +218,25 @@ public class MainActivity extends AppCompatActivity implements
                 .getInstance(getApplicationContext());
         tokenReceiver.setTokenReceivedListener(this);
         mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_view);
+        Log.d(TAG,"In onOptionsItemSelected");
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Log.d(TAG,"In android.R.id.home");
+                if (drawer.getDrawerLockMode(GravityCompat.START) == DrawerLayout.LOCK_MODE_UNLOCKED) {
+                    Log.d(TAG,"UNLOCKED");
+                    drawer.openDrawer(GravityCompat.START);
+                } else {
+                    Log.d(TAG,"Not UNLOCKED");
+                    onBackPressed();
+                }
+        }
+
+        return false;
     }
 
     private class OnTransmartNavigationItemSelectedListener implements NavigationView.OnNavigationItemSelectedListener {
@@ -609,9 +637,43 @@ public class MainActivity extends AppCompatActivity implements
     // Methods for GraphFragment
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
+    public void setToggleState(boolean isEnabled) {
+        if (drawer == null)
+            return;
 
+        if (isEnabled) {
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            animateToArrow(false);
+        } else {
+            drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            animateToArrow(true);
+        }
+        toggle.syncState();
     }
+
+    private void animateToArrow(boolean toArrow) {
+        int start, stop;
+        if (toArrow) {
+            start = 0;
+            stop = 1;
+        } else {
+            start = 1;
+            stop = 0;
+        }
+        ValueAnimator anim = ValueAnimator.ofFloat(start, stop);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float slideOffset = (Float) valueAnimator.getAnimatedValue();
+                toggle.onDrawerSlide(drawer, slideOffset);
+            }
+        });
+        anim.setInterpolator(new DecelerateInterpolator());
+        anim.setDuration(300);
+        anim.start();
+    }
+
+    // Util methods
 
     private void hideKeyboard() {
         View view = getCurrentFocus();

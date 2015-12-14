@@ -583,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements
         builder
                 .setTitle(R.string.sure_remove_server)
                 .setMessage(R.string.sure_remove_server_text)
-                .setIcon(R.drawable.ic_warning_black_18dp)
+                .setIcon(R.drawable.ic_warning_black_24dp)
                 .setPositiveButton(R.string.sure_remove_server_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         transmartServers.remove(transmartServer);

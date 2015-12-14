@@ -227,9 +227,8 @@ public class MainActivity extends AppCompatActivity implements
             //Check to see which item was being clicked and perform appropriate action
             if (menuItemId.equals(about_item)) {
                 Log.d(TAG,"Clicked about_item: "+ about_item);
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setTitle(R.string.info_title);
 
+                // Get package version information
                 PackageInfo pInfo = null;
                 try {
                     pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
@@ -240,9 +239,9 @@ public class MainActivity extends AppCompatActivity implements
                 String versionName = pInfo.versionName;
                 int versionCode = pInfo.versionCode;
 
-                final TextView message = new TextView(MainActivity.this);
-                message.setMovementMethod(LinkMovementMethod.getInstance());
-
+                // Create message with links
+                // TODO make translatable
+                // TODO insert Github icon with link
                 SpannableString s = new SpannableString(
                         "Version " + versionName + " (version code " + versionCode + ")\n" +
                                 "\n" +
@@ -254,15 +253,21 @@ public class MainActivity extends AppCompatActivity implements
                                 "Contribute at https://github.com/wardweistra/tranSMARTClient"
                 );
                 Linkify.addLinks(s, Linkify.WEB_URLS);
-                message.setText(s);
-                alertDialog.setView(message, 30, 30, 30, 30);
-                alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Cool", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-                // Set the Icon for the Dialog
-                alertDialog.setIcon(R.drawable.thehyve);
-                alertDialog.show();
+
+                // Create dialog
+                TextView message = (TextView) new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.info_title)
+                        .setMessage(s)
+                        .setIcon(R.drawable.thehyve)
+                        .setPositiveButton(R.string.info_positive, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        })
+                        .show()
+                        .findViewById(android.R.id.message);
+                // Make links clickable
+                message.setMovementMethod(LinkMovementMethod.getInstance());
+
 
                 return true;
             } else if (menuItemId.equals(add_server_item)) {
@@ -529,8 +534,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void authorizationLost() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder
+        new AlertDialog.Builder(MainActivity.this)
                 .setTitle(R.string.authorization_lost)
                 .setMessage(R.string.authorization_lost_text)
                 .setPositiveButton(R.string.authorization_lost_positive, new DialogInterface.OnClickListener() {
@@ -549,8 +553,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void connectionLost() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder
+        new AlertDialog.Builder(MainActivity.this)
                 .setTitle(R.string.connection_lost)
                 .setMessage(R.string.connection_lost_text)
                 .setPositiveButton(R.string.connection_lost_positive, new DialogInterface.OnClickListener() {
@@ -579,8 +582,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void removeServer() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder
+        new AlertDialog.Builder(MainActivity.this)
                 .setTitle(R.string.sure_remove_server)
                 .setMessage(R.string.sure_remove_server_text)
                 .setIcon(R.drawable.ic_warning_black_24dp)

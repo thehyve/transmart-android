@@ -37,4 +37,5 @@
     <string name="authorization_lost_text">The tranSMART server seems to have forgotten that you have given this app permission to access your data. Shall we try to reconnect?</string>
     <string name="authorization_lost_positive">Reconnect</string>
     <string name="authorization_lost_negative">Try again</string>
+    <string name="info_positive">Cool</string>
 </resources>

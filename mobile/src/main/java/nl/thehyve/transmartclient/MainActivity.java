@@ -677,8 +677,7 @@ public class MainActivity extends AppCompatActivity implements
         if (transmartServers.size() > 0) {
             Log.d(TAG, "Writing: " + gson.toJson(transmartServers));
             try {
-                FileOutputStream fos;
-                fos = openFileOutput(serversFileName, MODE_MULTI_PROCESS);
+                FileOutputStream fos = openFileOutput(serversFileName, MODE_MULTI_PROCESS);
                 PrintWriter pw = new PrintWriter(new BufferedWriter(
                         new OutputStreamWriter(fos)));
                 pw.println(gson.toJson(transmartServers));

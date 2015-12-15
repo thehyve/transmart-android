@@ -484,6 +484,12 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    private void reconnectToTranSMARTServer(TransmartServer reconnectTransmartServer) {
+        // TODO Reconnect using refresh token
+        // TODO Reconnect to this server, don't add new one
+        connectToTranSMARTServer(reconnectTransmartServer.getServerUrl(), reconnectTransmartServer.getServerLabel());
+    }
+
     // Methods for TokenReceiver
 
     public void onTokenReceived(ServerResult serverResult) {
@@ -542,7 +548,7 @@ public class MainActivity extends AppCompatActivity implements
                 .setMessage(R.string.authorization_lost_text)
                 .setPositiveButton(R.string.authorization_lost_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        connectToTranSMARTServer(transmartServer.getServerUrl(), transmartServer.getServerLabel());
+                        reconnectToTranSMARTServer(transmartServer);
                     }
                 })
                 .setNegativeButton(R.string.authorization_lost_negative, new DialogInterface.OnClickListener() {

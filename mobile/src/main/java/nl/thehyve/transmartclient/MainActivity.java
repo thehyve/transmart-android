@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.main_view);
-        Log.d(TAG,"In onOptionsItemSelected");
+        Log.d(TAG, "In onOptionsItemSelected");
         switch (item.getItemId()) {
             case android.R.id.home:
                 Log.d(TAG,"In android.R.id.home");

@@ -15,6 +15,7 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -174,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements
             readTransmartServersFromFile();
 
             if (!receivedURI) {
-                navigateToBeginState();
+                navigateToBeginState(true);
             }
         }
 
@@ -274,7 +275,8 @@ public class MainActivity extends AppCompatActivity implements
                 Log.d(TAG, "Clicked add_server_item: " + add_server_item);
 
                 Fragment fragment = new AddNewServerFragment();
-                fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                fragmentManager.beginTransaction()
+                        .replace(R.id.content_frame, fragment)
                         .addToBackStack("AddNewServerFragment")
                         .commit();
                 return true;
@@ -286,7 +288,8 @@ public class MainActivity extends AppCompatActivity implements
                         Log.d(TAG,"Clicked transmartServerItem ID: "+ transmartServerItem.getMenuItemID());
                         transmartServer = transmartServerItem;
                         Fragment fragment = new ServerOverviewFragment();
-                        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.content_frame, fragment)
                                 .addToBackStack("ServerOverviewFragment")
                                 .commit();
                         return true;
@@ -510,8 +513,8 @@ public class MainActivity extends AppCompatActivity implements
             mNavigationView.setCheckedItem(transmartServer.getMenuItemID());
 
             Fragment fragment = new ServerOverviewFragment();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
-                    .addToBackStack("ServerOverviewFragment")
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment)
                     .commitAllowingStateLoss();
 
         } else {
@@ -545,7 +548,9 @@ public class MainActivity extends AppCompatActivity implements
                 .setNegativeButton(R.string.authorization_lost_negative, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Fragment fragment = new ServerOverviewFragment();
-                        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.content_frame, fragment)
+                                .commit();
                     }
                 })
                 .show();
@@ -559,7 +564,9 @@ public class MainActivity extends AppCompatActivity implements
                 .setPositiveButton(R.string.connection_lost_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Fragment fragment = new ServerOverviewFragment();
-                        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.content_frame, fragment)
+                                .commit();
                     }
                 })
                 .setNegativeButton(R.string.connection_lost_negative, new DialogInterface.OnClickListener() {
@@ -575,7 +582,8 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onStudyClicked(String studyId) {
         Fragment fragment = GraphFragment.newInstance(studyId, transmartServer);
-        fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
+        fragmentManager.beginTransaction()
+                .replace(R.id.content_frame, fragment)
                 .addToBackStack("GraphFragment")
                 .commit();
     }
@@ -650,27 +658,35 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void navigateToBeginState() {
+    private void navigateToBeginState(boolean firstFragment) {
         Log.d(TAG,"Navigating to begin state");
-        if (transmartServers.size() > 0) {
-            Log.d(TAG,"Navigating to first server");
 
+        FragmentTransaction ft = fragmentManager.beginTransaction();
+        String fragmentName;
+
+        if (transmartServers.size() > 0) {
             transmartServer = transmartServers.get(0);
             Log.d(TAG, "Setting menu item " + transmartServer.getMenuItemID() + " to checked");
-
             mNavigationView.setCheckedItem(transmartServer.getMenuItemID());
-            Fragment fragment = new ServerOverviewFragment();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment)
-                    .addToBackStack("ServerOverviewFragment")
-                    .commit();
-        } else {
-            Log.d(TAG,"Navigating to add_server_item");
 
+            Fragment fragment = new ServerOverviewFragment();
+            ft.replace(R.id.content_frame, fragment);
+            fragmentName = "ServerOverviewFragment";
+        } else {
             Log.d(TAG, "Setting menu item " + add_server_item + " to checked");
             mNavigationView.setCheckedItem(add_server_item);
+
             Fragment fragment = new AddNewServerFragment();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+            ft.replace(R.id.content_frame, fragment);
+            fragmentName = "AddNewServerFragment";
         }
+
+        Log.d(TAG,"Navigating to "+fragmentName);
+        if (!firstFragment) {
+            ft.addToBackStack(fragmentName);
+        }
+
+        ft.commit();
     }
 
     private void writeTransmartServersToFile() {

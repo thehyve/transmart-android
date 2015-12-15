@@ -243,16 +243,9 @@ public class MainActivity extends AppCompatActivity implements
                 // Create message with links
                 // TODO make translatable
                 // TODO insert Github icon with link
-                SpannableString s = new SpannableString(
-                        "Version " + versionName + " (version code " + versionCode + ")\n" +
-                                "\n" +
-                                "We provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n" +
-                                "\n" +
-                                "This code is licensed under the GNU Lesser General Public License, " +
-                                "version 3, or (at your option) any later version.\n" +
-                                "\n" +
-                                "Contribute at https://github.com/wardweistra/tranSMARTClient"
-                );
+                SpannableString s = new SpannableString(String.format(getString(R.string.about_text),
+                        versionName,
+                        versionCode));
                 Linkify.addLinks(s, Linkify.WEB_URLS);
 
                 // Create dialog

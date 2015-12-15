@@ -50,5 +50,9 @@
     <string name="authorization_lost_positive">Reconnect</string>
     <string name="authorization_lost_negative">Try again</string>
     <string name="info_positive">Cool</string>
+    <string name="about_text">Version %1$s (version code %2$s)\n
+        \nWe provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n
+        \nThis code is licensed under the GNU Lesser General Public License, version 3, or (at your option) any later version.\n
+        \nContribute at https://github.com/wardweistra/tranSMARTClient</string>
 
 </resources>

@@ -590,7 +590,7 @@ public class MainActivity extends AppCompatActivity implements
                     public void onClick(DialogInterface dialog, int id) {
                         transmartServers.remove(transmartServer);
                         refreshNavigationMenu();
-                        navigateToBeginState();
+                        navigateToBeginState(false);
                     }
                 })
                 .setNegativeButton(R.string.sure_remove_server_negative, new DialogInterface.OnClickListener() {
@@ -686,6 +686,8 @@ public class MainActivity extends AppCompatActivity implements
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
+        } else {
+            deleteFile(serversFileName);
         }
     }
 

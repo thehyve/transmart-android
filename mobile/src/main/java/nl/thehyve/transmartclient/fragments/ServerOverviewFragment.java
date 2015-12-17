@@ -75,6 +75,7 @@ public class ServerOverviewFragment extends Fragment {
 //      TODO Show waiting sign: "Retrieving studies"
 
         new StudiesGetter().execute();
+//      TODO Set menuitem clicked from here
 
         getActivity().setTitle(R.string.serverOverview);
         return rootView;

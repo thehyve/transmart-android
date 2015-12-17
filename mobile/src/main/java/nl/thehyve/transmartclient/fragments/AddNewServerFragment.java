@@ -59,6 +59,8 @@ public class AddNewServerFragment extends Fragment {
             }
         });
 
+//      TODO Set menuitem clicked from here
+
         return rootView;
     }
 }

@@ -81,6 +81,7 @@ public class GraphFragment extends Fragment {
     public static GraphFragment newInstance(String studyId, TransmartServer transmartServer) {
         GraphFragment fragment = new GraphFragment();
         Bundle args = new Bundle();
+        // TODO accept Study instead of StudyID
         args.putString(ARG_STUDYID, studyId);
         fragment.setArguments(args);
         return fragment;

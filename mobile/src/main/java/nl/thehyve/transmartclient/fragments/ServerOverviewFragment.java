@@ -136,7 +136,7 @@ public class ServerOverviewFragment extends Fragment {
         @Override
         public void onBindViewHolder(ServerListAdapter.ViewHolder holder, int position) {
             holder.textStudyName.setText(studyList.get(position).getOntologyTerm().getName());
-            holder.textStudyId.setText("("+studyList.get(position).getId()+")");
+            holder.textStudyId.setText(String.format("(%s)", studyList.get(position).getId()));
         }
 
         @Override

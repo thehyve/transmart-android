@@ -24,11 +24,11 @@ import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 
-import nl.thehyve.transmartclient.MainActivity;
 import nl.thehyve.transmartclient.R;
 import nl.thehyve.transmartclient.apiItems.Study;
 import nl.thehyve.transmartclient.rest.RestInteractionListener;
 import nl.thehyve.transmartclient.rest.ServerResult;
+import nl.thehyve.transmartclient.rest.TransmartServer;
 
 /**
  * Created by Ward Weistra on 01-12-14.
@@ -38,14 +38,36 @@ import nl.thehyve.transmartclient.rest.ServerResult;
  */
 
 public class ServerOverviewFragment extends Fragment {
+    private static final String ARG_TRANSMARTSERVER = "transmartServer";
     private static final String TAG = "ServerOverviewFragment";
     private OnFragmentInteractionListener mListener;
     private RestInteractionListener restInteractionListener;
+
+    private TransmartServer transmartServer;
     private ArrayList<Study> studyList;
 
     private RecyclerView.Adapter mAdapter;
 
     Gson gson = new Gson();
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment ServerOverviewFragment.
+     */
+
+    public static ServerOverviewFragment newInstance(TransmartServer transmartServer) {
+        ServerOverviewFragment fragment = new ServerOverviewFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_TRANSMARTSERVER, transmartServer);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public ServerOverviewFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,7 +78,16 @@ public class ServerOverviewFragment extends Fragment {
         studyList = new ArrayList<>();
         mAdapter = new ServerListAdapter(studyList);
 
-        // start StudiesGetter here?
+        if (getArguments() != null) {
+            transmartServer = getArguments().getParcelable(ARG_TRANSMARTSERVER);
+
+            assert transmartServer != null;
+            if (transmartServer.getConnectionStatus() == TransmartServer.ConnectionStatus.CONNECTED) {
+                new StudiesGetter().execute();
+            } else {
+                restInteractionListener.notConnectedYet(transmartServer);
+            }
+        }
     }
 
     @Override
@@ -70,11 +101,8 @@ public class ServerOverviewFragment extends Fragment {
         mRecyclerView.setHasFixedSize(true);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this.getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setAdapter(mAdapter);
 
 //      TODO Show waiting sign: "Retrieving studies"
-
-        new StudiesGetter().execute();
 //      TODO Set menuitem clicked from here
 
         getActivity().setTitle(R.string.serverOverview);
@@ -92,7 +120,7 @@ public class ServerOverviewFragment extends Fragment {
         switch (item.getItemId()) {
             case R.id.action_removeServer:
                 Log.d(TAG,"Remove server");
-                mListener.removeServer();
+                mListener.removeServerDialog(transmartServer);
                 return true;
             default:
                 break;
@@ -160,15 +188,15 @@ public class ServerOverviewFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Clicked position " + getAdapterPosition() + ": " + studyList.get(getAdapterPosition()).getId());
-                mListener.onStudyClicked(studyList.get(getAdapterPosition()).getId());
+                mListener.onStudyClicked(studyList.get(getAdapterPosition()).getId(), transmartServer);
             }
         }
 
     }
 
     public interface OnFragmentInteractionListener {
-        void onStudyClicked(String studyId);
-        void removeServer();
+        void onStudyClicked(String studyId, TransmartServer transmartServer);
+        void removeServerDialog(TransmartServer transmartServer);
     }
 
     private class StudiesGetter extends AsyncTask<Void, Void, ServerResult> {
@@ -178,8 +206,8 @@ public class ServerOverviewFragment extends Fragment {
 
             ServerResult serverResult = new ServerResult();
 
-            String serverUrl = MainActivity.transmartServer.getServerUrl();
-            String access_token = MainActivity.transmartServer.getAccess_token();
+            String serverUrl    = transmartServer.getServerUrl();
+            String access_token = transmartServer.getAccess_token();
 
             String query = serverUrl + "/"
                     + "studies"
@@ -226,11 +254,11 @@ public class ServerOverviewFragment extends Fragment {
                 mAdapter.notifyDataSetChanged();
             } else if (serverResult.getResponseCode() == 401) {
                 if (restInteractionListener != null) {
-                    restInteractionListener.authorizationLost();
+                    restInteractionListener.authorizationLost(transmartServer);
                 }
             } else if (serverResult.getResponseCode() == 0) {
                 if (restInteractionListener != null) {
-                    restInteractionListener.connectionLost();
+                    restInteractionListener.connectionLost(transmartServer);
                 }
             } else {
                 Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Server responded with code "

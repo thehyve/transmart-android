@@ -54,5 +54,9 @@
         \nWe provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n
         \nThis code is licensed under the GNU Lesser General Public License, version 3, or (at your option) any later version.\n
         \nContribute at https://github.com/wardweistra/tranSMARTClient</string>
+    <string name="not_connected_yet">Not connected yet</string>
+    <string name="not_connected_yet_text">Please make sure to login to tranSMART and authorize this application to access your data.</string>
+    <string name="not_connected_yet_positive">Connect</string>
+    <string name="not_connected_yet_negative">Cancel</string>
 
 </resources>

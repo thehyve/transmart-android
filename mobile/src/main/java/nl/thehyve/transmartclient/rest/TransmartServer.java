@@ -19,6 +19,16 @@ public class TransmartServer implements Parcelable {
     String refresh_token;
     String serverLabel;
     Integer menuItemID;
+    ConnectionStatus connectionStatus;
+
+    public enum ConnectionStatus {
+        NOTCONNECTED,
+        SENTTOURL,    // Unique
+        CODERECEIVED, // Unique
+        ACCESSTOKENEXPIRED,
+        REFRESHTOKENEXPIRED,
+        CONNECTED
+    }
 
     // Standard basic constructor for non-parcel object creation
     public TransmartServer() {
@@ -26,6 +36,7 @@ public class TransmartServer implements Parcelable {
         this.access_token = "";
         this.refresh_token = "";
         this.serverLabel = "";
+        this.connectionStatus = null;
         Log.d(TAG, "transmartServer has been instantiated from scratch.");
     }
     // Constructor to use when re-constructing object from a parcel
@@ -41,6 +52,7 @@ public class TransmartServer implements Parcelable {
         out.writeString(access_token);
         out.writeString(refresh_token);
         out.writeString(serverLabel);
+        out.writeSerializable(connectionStatus);
 
         Log.d(TAG, "transmartServer has been written to parcel.");
         Log.d(TAG, "Server URL: " + serverUrl);
@@ -53,6 +65,7 @@ public class TransmartServer implements Parcelable {
         this.access_token = in.readString();
         this.refresh_token = in.readString();
         this.serverLabel = in.readString();
+        this.connectionStatus = (ConnectionStatus) in.readSerializable();
 
         Log.d(TAG, "transmartServer has been read from parcel.");
         Log.d(TAG, "Server URL: "+ serverUrl);
@@ -76,6 +89,9 @@ public class TransmartServer implements Parcelable {
     public Integer getMenuItemID() {
         return menuItemID;
     }
+    public ConnectionStatus getConnectionStatus() {
+        return connectionStatus;
+    }
 
     // Setters
     public void setAccess_token(String access_token) {
@@ -94,6 +110,9 @@ public class TransmartServer implements Parcelable {
     }
     public void setMenuItemID(Integer menuItemID) {
         this.menuItemID = menuItemID;
+    }
+    public void setConnectionStatus(ConnectionStatus connectionStatus) {
+        this.connectionStatus = connectionStatus;
     }
 
 

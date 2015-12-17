@@ -1,5 +1,6 @@
 package nl.thehyve.transmartclient.fragments;
 
+import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -22,12 +23,39 @@ import nl.thehyve.transmartclient.R;
  */
 
 public class AddNewServerFragment extends Fragment {
+    private static final String ARG_SERVERURL = "serverUrl";
+    private static final String ARG_SERVERLABEL = "serverLabel";
+    private static final String ARG_WAITINGFORTOKEN = "waitingForToken";
     private static final String TAG = "AddNewServerFragment";
+
+    private String serverUrl;
+    private String serverLabel;
+    private boolean waitingForToken;
+
+    public static AddNewServerFragment newInstance(String serverUrl, String serverLabel, boolean waitingForToken) {
+        AddNewServerFragment fragment = new AddNewServerFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_SERVERURL, serverUrl);
+        args.putString(ARG_SERVERLABEL, serverLabel);
+        args.putBoolean(ARG_WAITINGFORTOKEN, waitingForToken);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public AddNewServerFragment() {
+        // Required empty public constructor
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        if (getArguments() != null) {
+            serverUrl = getArguments().getString(ARG_SERVERURL);
+            serverLabel = getArguments().getString(ARG_SERVERLABEL);
+            waitingForToken = getArguments().getBoolean(ARG_WAITINGFORTOKEN);
+        }
     }
 
     @Override
@@ -36,15 +64,27 @@ public class AddNewServerFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_addnewserver, container, false);
         getActivity().setTitle(R.string.addnewserver);
 
-        final EditText serverUrlEditText = (EditText) rootView.findViewById(R.id.serverUrlField);
+        final EditText serverUrlField = (EditText) rootView.findViewById(R.id.serverUrlField);
         final EditText serverLabelField = (EditText) rootView.findViewById(R.id.serverLabelField);
         final Button connect_button = (Button) rootView.findViewById(R.id.connect_button);
+
+        if (serverUrl != null || serverLabel != null) {
+            serverUrlField.setText(serverUrl);
+            serverLabelField.setText(serverLabel);
+        }
+
+        if (waitingForToken) {
+            // TODO show loading sign
+            serverUrlField.setEnabled(false);
+            serverLabelField.setEnabled(false);
+            connect_button.setEnabled(false);
+        }
 
         LinearLayout exampleContainer = (LinearLayout) rootView.findViewById(R.id.exampleContainer);
         exampleContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                serverUrlEditText.setText(getString(R.string.urlExample));
+                serverUrlField.setText(getString(R.string.urlExample));
                 serverLabelField.setText(getString(R.string.labelExample));
             }
         });

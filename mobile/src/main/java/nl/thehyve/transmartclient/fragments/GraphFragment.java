@@ -1,6 +1,5 @@
 package nl.thehyve.transmartclient.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -38,10 +37,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import nl.thehyve.transmartclient.MainActivity;
 import nl.thehyve.transmartclient.R;
 import nl.thehyve.transmartclient.apiItems.Concept;
 import nl.thehyve.transmartclient.apiItems.Observation;
+import nl.thehyve.transmartclient.apiItems.Study;
 import nl.thehyve.transmartclient.rest.RestInteractionListener;
 import nl.thehyve.transmartclient.rest.ServerResult;
 import nl.thehyve.transmartclient.rest.TransmartServer;
@@ -59,9 +58,12 @@ import nl.thehyve.transmartclient.chartItems.PieChartItem;
  */
 public class GraphFragment extends Fragment {
     private static final String ARG_STUDYID = "studyId";
+    private static final String ARG_TRANSMARTSERVER = "transmartServer";
     private static final String TAG = "GraphFragment";
 
     private String studyId;
+    private Study study;
+    private TransmartServer transmartServer;
     private View rootView;
 
     private OnFragmentInteractionListener mListener;
@@ -83,6 +85,7 @@ public class GraphFragment extends Fragment {
         Bundle args = new Bundle();
         // TODO accept Study instead of StudyID
         args.putString(ARG_STUDYID, studyId);
+        args.putParcelable(ARG_TRANSMARTSERVER, transmartServer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,12 +98,19 @@ public class GraphFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        list = new ArrayList<ChartItem>();
+        list = new ArrayList<>();
         cda = new ChartDataAdapter(getActivity(), list);
 
         if (getArguments() != null) {
             studyId = getArguments().getString(ARG_STUDYID);
-            new ConceptsGetter().execute();
+            transmartServer = getArguments().getParcelable(ARG_TRANSMARTSERVER);
+
+            assert transmartServer != null;
+            if (transmartServer.getConnectionStatus() == TransmartServer.ConnectionStatus.CONNECTED) {
+                new ConceptsGetter().execute();
+            } else {
+                restInteractionListener.notConnectedYet(transmartServer);
+            }
         }
     }
 
@@ -144,14 +154,16 @@ public class GraphFragment extends Fragment {
         return rootView;
     }
 
+
+
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
-            restInteractionListener = (RestInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) context;
+            restInteractionListener = (RestInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener" +
                     " and RestInteractionListener");
         }
@@ -164,8 +176,8 @@ public class GraphFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onDestroyView() {
+        super.onDestroyView();
         mListener.setToggleState(true);
     }
 
@@ -190,8 +202,8 @@ public class GraphFragment extends Fragment {
 
             ServerResult serverResult = new ServerResult();
 
-            String serverUrl = MainActivity.transmartServer.getServerUrl();
-            String access_token = MainActivity.transmartServer.getAccess_token();
+            String serverUrl    = transmartServer.getServerUrl();
+            String access_token = transmartServer.getAccess_token();
 
             String query = serverUrl + "/"
                     + "studies/"
@@ -229,11 +241,11 @@ public class GraphFragment extends Fragment {
                 }
             } else if (serverResult.getResponseCode() == 401) {
                 if (restInteractionListener != null) {
-                    restInteractionListener.authorizationLost();
+                    restInteractionListener.authorizationLost(transmartServer);
                 }
             } else if (serverResult.getResponseCode() == 0) {
                 if (restInteractionListener != null) {
-                    restInteractionListener.connectionLost();
+                    restInteractionListener.connectionLost(transmartServer);
                 }
             } else {
                 String message = String.format(getString(R.string.server_responded_with),
@@ -270,8 +282,8 @@ public class GraphFragment extends Fragment {
             Log.d(TAG,"conceptLink: " + conceptLink);
             ServerResult serverResult = new ServerResult();
 
-            String serverUrl = MainActivity.transmartServer.getServerUrl();
-            String access_token = MainActivity.transmartServer.getAccess_token();
+            String serverUrl    = transmartServer.getServerUrl();
+            String access_token = transmartServer.getAccess_token();
 
             String query = serverUrl + "/"
                     + "studies/"
@@ -299,11 +311,11 @@ public class GraphFragment extends Fragment {
                 }
             } else if (serverResult.getResponseCode() == 401) {
                 if (restInteractionListener != null) {
-                    restInteractionListener.authorizationLost();
+                    restInteractionListener.authorizationLost(transmartServer);
                 }
             } else if (serverResult.getResponseCode() == 0) {
                 if (restInteractionListener != null) {
-                    restInteractionListener.connectionLost();
+                    restInteractionListener.connectionLost(transmartServer);
                 }
             } else {
                 String message = String.format(getString(R.string.server_responded_with),

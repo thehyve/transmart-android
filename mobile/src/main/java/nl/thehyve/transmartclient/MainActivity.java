@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements
     private LocalBroadcastManager mBroadcastMgr;
     private android.support.v4.app.FragmentManager fragmentManager;
 
-    Integer about_item, add_server_item;
+    int about_item, add_server_item;
 
     private final static String serversFileName = "servers.txt";
     Gson gson = new Gson();

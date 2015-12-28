@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_name">TranSMART Client</string>
-    <string name="app__display_name">TranSMART</string>
+    <string name="app_display_name">TranSMART</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

@@ -9,7 +9,7 @@
     <string name="button_submit">Verbind</string>
     <string name="serverOverview">Server overzicht</string>
     <string name="studyOverviewIntro">Dit zijn de studies in deze tranSMART server.</string>
-    <string name="app__display_name">TranSMART</string>
+    <string name="app_display_name">TranSMART</string>
     <string name="info_title">Ontwikkeld door The Hyve</string>
     <string name="labelExample">The Hyve Demo</string>
     <string name="malformed_url">Begin met http:// of https://</string>

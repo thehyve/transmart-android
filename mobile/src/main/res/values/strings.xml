@@ -15,7 +15,7 @@
     <string name="no_app_for_url">No app installed to open this URL</string>
     <string name="server_responded_with">Server responded with code %1$s: %2$s</string>
     <string name="addServerText">Example:</string>
-    <string name="urlExample">http://transmart-demo.thehyve.net/transmart</string>
+    <string name="urlExample" translatable="false">http://transmart-demo.thehyve.net/transmart</string>
     <string name="labelExample">The Hyve Demo</string>
     <string name="addServerText2">Log in with user and pass \'user\'.</string>
 

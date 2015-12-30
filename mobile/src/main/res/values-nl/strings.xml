@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TranSMART Client</string>
-    <string name="action_about">Over</string>
-    <string name="action_addNewServer">Nieuwe Server</string>
+    <string name="menu_about">Info</string>
+    <string name="menu_addNewServer">Server toevoegen</string>
     <string name="addServerText">Voorbeeld:</string>
     <string name="addServerText2">Log in met gebruiker en wachtwoord \'user\'.</string>
     <string name="addnewserver">Voeg een nieuwe server toe</string>
@@ -16,7 +16,7 @@
     <string name="no_server_url_specified">Vul eerst je tranSMART URL in</string>
     <string name="serverLabel">Label (optioneel)</string>
     <string name="serverUrl">URL naar jouw tranSMART server</string>
-    <string name="contentDescriptionHeader">TranSMART Client header image</string>
+    <string name="contentDescriptionHeader">TranSMART Client header plaatje</string>
     <string name="check_internet">Controleer of je nog verbonden bent met het internet.</string>
     <string name="snackbar_ok">OK</string>
     <string name="no_app_for_url">Geen app geinstalleerd om deze URL te openen</string>
@@ -26,21 +26,30 @@
     <string name="contentDescHelpImage">Help plaatje</string>
     <string name="action_removeServer">Verwijder server</string>
     <string name="sure_remove_server">Server verwijderen?</string>
-    <string name="sure_remove_server_text">Are you sure you want to remove this server?</string>
+    <string name="sure_remove_server_text">Weet je zeker dat je deze server wilt verwijderen?</string>
     <string name="sure_remove_server_positive">Verwijder</string>
     <string name="sure_remove_server_negative">Annuleren</string>
-    <string name="connection_lost">Connection lost</string>
-    <string name="connection_lost_text">We seem to be unable to reach the tranSMART server. Please check your internet connection and try again.</string>
-    <string name="connection_lost_positive">Try again</string>
-    <string name="connection_lost_negative">Cancel</string>
-    <string name="authorization_lost">Authorization lost</string>
-    <string name="authorization_lost_text">The tranSMART server seems to have forgotten that you have given this app permission to access your data. Shall we try to reconnect?</string>
-    <string name="authorization_lost_positive">Reconnect</string>
-    <string name="authorization_lost_negative">Try again</string>
+    <string name="connection_lost">Geen verbinding</string>
+    <string name="connection_lost_text">We kunnen de tranSMART server niet bereiken. Controleer je internet verbinding en probeer opnieuw.</string>
+    <string name="connection_lost_positive">Probeer opnieuw</string>
+    <string name="connection_lost_negative">Annuleren</string>
+    <string name="authorization_lost_text">De tranSMART server is vergeten dat je deze app toegang gegeven hebt tot je data. Wil je opnieuw verbinden?</string>
+    <string name="authorization_lost_positive">Opnieuw verbinden</string>
+    <string name="authorization_lost_negative">Annuleren</string>
     <string name="info_positive">Cool</string>
-    <string name="about_text">Version %1$s (version code %2$s)  We provide open source solutions for bioinformatics. Find us at http://thehyve.nl  This code is licensed under the GNU Lesser General Public License, version 3, or (at your option) any later version.  Contribute at https://github.com/wardweistra/tranSMARTClient</string>
-    <string name="not_connected_yet">Not connected yet</string>
-    <string name="not_connected_yet_text">Please make sure to login to tranSMART and authorize this application to access your data.</string>
-    <string name="not_connected_yet_positive">Connect</string>
-    <string name="not_connected_yet_negative">Cancel</string>
+    <string name="about_text">Versie %1$s (versiecode %2$s)\n         \nWij bieden open source oplossingen voor de bioinformatica. Vind ons op http://thehyve.nl\n         \nDe licensie van deze code is de GNU Lesser General Public License, versie 3, of (naar jouw keuze) elke volgende versie.\n         \nDraag bij op https://github.com/wardweistra/tranSMARTClient</string>
+    <string name="not_connected_yet">Nog niet verbonden</string>
+    <string name="not_connected_yet_text">Zorg dat je inlogt bij tranSMART en deze app toegang geeft tot jouw data.</string>
+    <string name="not_connected_yet_positive">Verbinden</string>
+    <string name="not_connected_yet_negative">Annuleren</string>
+    <string name="action_refresh">Vernieuwen</string>
+    <string name="action_reconnectServerDialog">Opnieuw verbinden</string>
+    <string name="authorization_lost">Opnieuw verbinden?</string>
+    <string name="snackbar_reconnected">Reconnected to %s</string>
+    <string name="snackbar_connected">Verbonden met %s</string>
+    <string name="menu_serversSubmenu">Servers</string>
+    <string name="duplicate_url">Dubbele URL</string>
+    <string name="duplicate_url_text">Je hebt al een server met deze URL verbonden. Wanneer je meerdere servers met de zelfde URL en gebruikersnaam verbindt levert dat onverwachte problemen op. Weet je zeker dat je deze server toch nogmaals toe wil voegen?</string>
+    <string name="duplicate_url_positive">Toch verbinden</string>
+    <string name="duplicate_url_negative">Annuleren</string>
 </resources>

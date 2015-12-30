@@ -123,9 +123,17 @@ public class ServerOverviewFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_refresh:
+                Log.d(TAG, "Reconnect server");
+                new StudiesGetter().execute();
+                return true;
             case R.id.action_removeServer:
-                Log.d(TAG,"Remove server");
+                Log.d(TAG, "Remove server");
                 mListener.removeServerDialog(transmartServer);
+                return true;
+            case R.id.action_reconnectServerDialog:
+                Log.d(TAG, "Reconnect server via dialog");
+                restInteractionListener.reconnectDialog(transmartServer);
                 return true;
             default:
                 break;

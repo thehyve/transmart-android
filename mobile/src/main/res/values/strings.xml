@@ -24,8 +24,9 @@
 
     <!-- Menu items -->
     <string name="contentDescriptionHeader">TranSMART Client header image</string>
-    <string name="action_addNewServer">New Server</string>
-    <string name="action_about">About</string>
+    <string name="menu_serversSubmenu">Servers</string>
+    <string name="menu_addNewServer">Add server</string>
+    <string name="menu_about">About</string>
 
     <!-- Fragment titles -->
     <string name="serverOverview">Server overview</string>
@@ -45,10 +46,10 @@
     <string name="connection_lost_text">We seem to be unable to reach the tranSMART server. Please check your internet connection and try again.</string>
     <string name="connection_lost_positive">Try again</string>
     <string name="connection_lost_negative">Cancel</string>
-    <string name="authorization_lost">Authorization lost</string>
-    <string name="authorization_lost_text">The tranSMART server seems to have forgotten that you have given this app permission to access your data. Shall we try to reconnect?</string>
+    <string name="authorization_lost">Reconnect to server?</string>
+    <string name="authorization_lost_text">The tranSMART server has forgotten that you have given this app permission to access your data. Do you want to reconnect?</string>
     <string name="authorization_lost_positive">Reconnect</string>
-    <string name="authorization_lost_negative">Try again</string>
+    <string name="authorization_lost_negative">Cancel</string>
     <string name="info_positive">Cool</string>
     <string name="about_text">Version %1$s (version code %2$s)\n
         \nWe provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n
@@ -58,5 +59,14 @@
     <string name="not_connected_yet_text">Please make sure to login to tranSMART and authorize this application to access your data.</string>
     <string name="not_connected_yet_positive">Connect</string>
     <string name="not_connected_yet_negative">Cancel</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_reconnectServerDialog">Reconnect</string>
+    <string name="snackbar_reconnected">Reconnected to %s</string>
+    <string name="snackbar_connected">Connected to %s</string>
+    <string name="duplicate_url">Duplicate URL</string>
+    <string name="duplicate_url_text">You have already connected a server with this URL. Connecting to the same server twice with the same username will result in unexpected behaviour. Are you sure you want to connect this server again?</string>
+    <string name="duplicate_url_positive">Connect anyway</string>
+    <string name="duplicate_url_negative">Cancel</string>
+    <string name="received_empty_code">Received empty OAuth code</string>
 
 </resources>

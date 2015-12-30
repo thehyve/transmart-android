@@ -4,6 +4,7 @@
         <item>/login/auth</item>
         <item>/login/forceAuth</item>
         <item>/RWG</item>
+        <item>/datasetExplorer</item>
         <item>/datasetExplorer/index</item>
         <item>/oauth/authorize</item>
         <item>/</item>

@@ -201,9 +201,6 @@ public class MainActivity extends AppCompatActivity implements
                                 }
                             }).show();
 
-                    // TODO navigate to addNewServer fragment when reconnecting
-                    // Navigate back to the server overview
-
                     if (transmartServer.wasConnected()) {
 
                         // Set status back to connected

@@ -192,10 +192,6 @@ public class MainActivity extends AppCompatActivity implements
 
                 if (transmartServer != null) {
 
-                    // Set status back to connected
-                    transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
-                    Log.d(TAG, "Now the connectionStatus is " + transmartServer.getConnectionStatus());
-
                     // Show snackbar
                     String message = getString(R.string.received_empty_code);
                     Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
@@ -207,11 +203,30 @@ public class MainActivity extends AppCompatActivity implements
 
                     // TODO navigate to addNewServer fragment when reconnecting
                     // Navigate back to the server overview
-                    Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.content_frame, fragment)
-                            // Don't add to backstack, always the first fragment of a session
-                            .commit();
+
+                    if (transmartServer.wasConnected()) {
+
+                        // Set status back to connected
+                        transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
+                        Log.d(TAG, "Now the connectionStatus is " + transmartServer.getConnectionStatus());
+
+                        // Navigate back to serverOverviewFragment
+                        Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.content_frame, fragment)
+                                        // Don't add to backstack, always the first fragment of a session
+                                .commit();
+                    } else {
+                        // Navigate back to AddNewServerFragment with correct values
+                        Fragment fragment = AddNewServerFragment.newInstance(
+                                transmartServer.getServerUrl(),
+                                transmartServer.getServerLabel(),
+                                true);
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.content_frame, fragment)
+                                        // Don't add to backstack, always the first fragment of a session
+                                .commit();
+                    }
                 } else {
                     Log.w(TAG, "No servers with connectionStatus: SENTTOURL");
                 }

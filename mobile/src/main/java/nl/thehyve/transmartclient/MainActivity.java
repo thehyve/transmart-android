@@ -231,7 +231,6 @@ public class MainActivity extends AppCompatActivity implements
         mBroadcastMgr = LocalBroadcastManager
                 .getInstance(getApplicationContext());
         tokenReceiver.setTokenReceivedListener(this);
-        mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
     }
 
     @Override
@@ -412,6 +411,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         Log.d(TAG, "--> onResume called");
+        mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
         super.onResume();
     }
 
@@ -425,7 +425,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         Log.d(TAG, "--> onDestroy called");
-        mBroadcastMgr.unregisterReceiver(tokenReceiver);
         writeTransmartServersToFile();
         super.onDestroy();
     }

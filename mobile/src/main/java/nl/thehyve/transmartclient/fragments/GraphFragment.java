@@ -106,8 +106,14 @@ public class GraphFragment extends Fragment {
             transmartServer = getArguments().getParcelable(ARG_TRANSMARTSERVER);
 
             assert transmartServer != null;
-            if (transmartServer.getConnectionStatus() == TransmartServer.ConnectionStatus.CONNECTED) {
+            TransmartServer.ConnectionStatus connectionStatus = transmartServer.getConnectionStatus();
+            if (connectionStatus == TransmartServer.ConnectionStatus.CONNECTED) {
                 new ConceptsGetter().execute();
+            } else if (connectionStatus == TransmartServer.ConnectionStatus.ACCESSTOKENEXPIRED
+                    || connectionStatus == TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT) {
+                restInteractionListener.authorizationLost(transmartServer);
+            } else if (connectionStatus == TransmartServer.ConnectionStatus.REFRESHTOKENEXPIRED) {
+                restInteractionListener.reconnectDialog(transmartServer);
             } else {
                 restInteractionListener.notConnectedYet(transmartServer);
             }

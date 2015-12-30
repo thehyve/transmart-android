@@ -166,21 +166,56 @@ public class MainActivity extends AppCompatActivity implements
             editor.putBoolean("oauthCodeUsed", true);
             editor.apply();
 
-            if (transmartServer != null) {
-                setUniqueConnectionStatus(transmartServer, TransmartServer.ConnectionStatus.CODERECEIVED);
-                Log.d(TAG, "Now the connectionStatus is " + transmartServer.getConnectionStatus());
+            if (code != null) {
 
-                Fragment fragment = AddNewServerFragment.newInstance(
-                        transmartServer.getServerUrl(),
-                        transmartServer.getServerLabel(),
-                        true);
-                fragmentManager.beginTransaction()
-                        .replace(R.id.content_frame, fragment)
-                        .commit();
+                if (transmartServer != null) {
+                    setUniqueConnectionStatus(transmartServer, TransmartServer.ConnectionStatus.CODERECEIVED);
+                    Log.d(TAG, "Now the connectionStatus is " + transmartServer.getConnectionStatus());
 
-                new TokenGetterTask(this.getApplicationContext(), transmartServer, CLIENT_ID, CLIENT_SECRET).execute(code);
+                    Fragment fragment = AddNewServerFragment.newInstance(
+                            transmartServer.getServerUrl(),
+                            transmartServer.getServerLabel(),
+                            true);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.content_frame, fragment)
+                            // Don't add to backstack, always the first fragment of a session
+                            .commit();
+
+                    new TokenGetterTask(this.getApplicationContext(), transmartServer, CLIENT_ID, CLIENT_SECRET, code).execute();
+                } else {
+                    Log.w(TAG, "No servers with connectionStatus: SENTTOURL");
+                }
+
             } else {
-                Log.w(TAG,"No servers with connectionStatus: SENTTOURL");
+                Log.d(TAG,"Received empty OAuth code");
+
+                if (transmartServer != null) {
+
+                    // Set status back to connected
+                    transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
+                    Log.d(TAG, "Now the connectionStatus is " + transmartServer.getConnectionStatus());
+
+                    // Show snackbar
+                    String message = getString(R.string.received_empty_code);
+                    Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                }
+                            }).show();
+
+                    // TODO navigate to addNewServer fragment when reconnecting
+                    // Navigate back to the server overview
+                    Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.content_frame, fragment)
+                            // Don't add to backstack, always the first fragment of a session
+                            .commit();
+                } else {
+                    Log.w(TAG, "No servers with connectionStatus: SENTTOURL");
+                }
+
+
             }
 
             receivedURI = true;
@@ -482,14 +517,20 @@ public class MainActivity extends AppCompatActivity implements
 
     // Methods for TokenReceiver
 
-    public void onTokenReceived(ServerResult serverResult) {
-        if (serverResult.getResponseCode() == 200) {
-            String access_token;
+    public void onTokenReceived(ServerResult serverResult, boolean reconnect) {
 
-            TransmartServer transmartServer = getUniqueConnectionStatus(
+        Log.d(TAG, "onTokenReceived with serverResult: " + serverResult);
+
+        TransmartServer transmartServer = reconnect ?
+            getUniqueConnectionStatus(
+                    TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT) :
+            getUniqueConnectionStatus(
                     TransmartServer.ConnectionStatus.CODERECEIVED);
 
-            if (transmartServer != null) {
+        if (transmartServer != null) {
+
+            if (serverResult.getResponseCode() == 200) {
+                String access_token;
 
                 Log.d(TAG, "Received token, going to add it to server: " + transmartServer.getServerLabel());
 
@@ -505,36 +546,58 @@ public class MainActivity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
 
-                transmartServer.setConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
+                transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
                 refreshNavigationMenu();
 
-                Log.d(TAG, "Setting menu item " + transmartServer.getMenuItemID() + " to checked");
-                mNavigationView.setCheckedItem(transmartServer.getMenuItemID());
+                hideKeyboard();
+
+                String message = String.format(reconnect ? getString(R.string.snackbar_reconnected)
+                        : getString(R.string.snackbar_connected),transmartServer.getServerLabel());
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                            }
+                        }).show();
 
                 Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
                 fragmentManager.beginTransaction()
                         .replace(R.id.content_frame, fragment)
+                        .addToBackStack("ServerOverviewFragment")
                         .commitAllowingStateLoss();
 
-            } else {
-                Log.w(TAG,"No servers with connectionStatus: CODERECEIVED");
-            }
-
-        } else {
-
-            String message = String.format(getString(R.string.server_responded_with),
-                    serverResult.getResponseCode(),
-                    serverResult.getResponseDescription());
-            Log.d(TAG, message);
-            Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
-            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
+            } else if (serverResult.getResponseCode() == 401) {
+                if (reconnect) {
+                    transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.REFRESHTOKENEXPIRED);
+                    reconnectDialog(transmartServer);
                 }
-            }).show();
+            } else if (serverResult.getResponseCode() == 0) {
+                if (reconnect) {
+                    transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.ACCESSTOKENEXPIRED);
+                }
+                connectionLost(transmartServer);
+            } else {
+                if (reconnect) {
+                    transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.ACCESSTOKENEXPIRED);
+                }
+
+                String message = String.format(getString(R.string.server_responded_with),
+                        serverResult.getResponseCode(),
+                        serverResult.getResponseDescription());
+                Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                            }
+                        }).show();
+            }
+        } else {
+            Log.w(TAG,"No servers with connectionStatus: CODERECEIVED/CODERECEIVEDRECONNECT");
+        }
+    }
+
     // Methods for MenuListener interface
 
-        }
     @Override
     public void setMenuItemChecked(int menuItem) {
         Log.d(TAG, "Setting menu item " + menuItem + " to checked");
@@ -565,7 +628,14 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void authorizationLost(final TransmartServer transmartServer) {
-        // TODO first try to renew the authorisation token with the refresh token. Only on fail give reconnect dialog.
+        if (transmartServer.getConnectionStatus() != TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT) {
+            setUniqueConnectionStatus(transmartServer, TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT);
+            new TokenGetterTask(this.getApplicationContext(), transmartServer, CLIENT_ID, CLIENT_SECRET).execute();
+        }
+    }
+
+    @Override
+    public void reconnectDialog(final TransmartServer transmartServer) {
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle(R.string.authorization_lost)
                 .setMessage(R.string.authorization_lost_text)
@@ -785,16 +855,43 @@ public class MainActivity extends AppCompatActivity implements
             TransmartServer.ConnectionStatus connectionStatus) {
 
         Log.d(TAG,"Going to set connectionStatus to "+connectionStatus+" for "+transmartServer);
-        Log.d(TAG,"All servers for connectionStatus:"+transmartServers);
-        // Make sure all other abandoned TransmartServers of this type get removed
+        Log.d(TAG,"All servers for connectionStatus: "+transmartServers);
+
+        // Make sure all other abandoned TransmartServers of this type get
+        // removed on next write (if non connected) or set to access token expired (when connected status)
         for (TransmartServer transmartServerOther : transmartServers) {
             if (transmartServerOther.getConnectionStatus() == connectionStatus
                     && transmartServerOther != transmartServer) {
-                Log.d(TAG, "Setting to notconnected: "+transmartServerOther);
-                transmartServerOther.setConnectionStatus(TransmartServer.ConnectionStatus.NOTCONNECTED);
+                if (transmartServerOther.wasConnected()) {
+                    Log.d(TAG, "Setting other server back to connected:  " + transmartServerOther);
+                    transmartServerOther.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
+                } else {
+                    Log.d(TAG, "Setting other server to abandoned:  " + transmartServerOther);
+                    transmartServerOther.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.ABANDONED);
+                    refreshNavigationMenu();
+                }
             }
         }
+        transmartServer.setUniqueConnectionStatus(connectionStatus, transmartServers);
+    }
 
-        transmartServer.setConnectionStatus(connectionStatus);
+    private List<TransmartServer> getConnectedServers() {
+        List<TransmartServer> connectedServers = new ArrayList<>();
+        for (TransmartServer transmartServer : transmartServers){
+            if (transmartServer.wasConnected()){
+                connectedServers.add(transmartServer);
+            }
+        }
+        return connectedServers;
+    }
+
+    private List<TransmartServer> getNotAbandonedServers() {
+        List<TransmartServer> notAbandonedServers = new ArrayList<>();
+        for (TransmartServer transmartServer : transmartServers){
+            if (transmartServer.getConnectionStatus() != TransmartServer.ConnectionStatus.ABANDONED){
+                notAbandonedServers.add(transmartServer);
+            }
+        }
+        return notAbandonedServers;
     }
 }

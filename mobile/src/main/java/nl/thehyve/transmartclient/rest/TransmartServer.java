@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import java.util.List;
+
 /**
  * Created by Ward Weistra on 01-12-14.
  * Copyright (c) 2015 The Hyve B.V.
@@ -20,14 +22,26 @@ public class TransmartServer implements Parcelable {
     String serverLabel;
     int menuItemID;
     ConnectionStatus connectionStatus;
+    boolean wasConnected;
 
     public enum ConnectionStatus {
-        NOTCONNECTED,
-        SENTTOURL,    // Unique
-        CODERECEIVED, // Unique
-        ACCESSTOKENEXPIRED,
-        REFRESHTOKENEXPIRED,
-        CONNECTED
+        ABANDONED            (false),
+        SENTTOURL            (true ),
+        CODERECEIVED         (true ),
+        CONNECTED            (false),
+        ACCESSTOKENEXPIRED   (false),
+        CODERECEIVEDRECONNECT(true ),
+        REFRESHTOKENEXPIRED  (false);
+
+        private final boolean unique;
+
+        ConnectionStatus(boolean unique) {
+            this.unique = unique;
+        }
+
+        public boolean isUnique() {
+            return unique;
+        }
     }
 
     // Standard basic constructor for non-parcel object creation
@@ -37,6 +51,7 @@ public class TransmartServer implements Parcelable {
         this.refresh_token = "";
         this.serverLabel = "";
         this.connectionStatus = null;
+        this.wasConnected = false;
         Log.d(TAG, "transmartServer has been instantiated from scratch.");
     }
     // Constructor to use when re-constructing object from a parcel
@@ -54,6 +69,7 @@ public class TransmartServer implements Parcelable {
         out.writeString(serverLabel);
         out.writeInt(menuItemID);
         out.writeSerializable(connectionStatus);
+        out.writeByte((byte) (wasConnected ? 1 : 0));
 
         Log.d(TAG, "transmartServer has been written to parcel.");
         Log.d(TAG, "Server URL: " + serverUrl);
@@ -68,6 +84,7 @@ public class TransmartServer implements Parcelable {
         this.serverLabel = in.readString();
         this.menuItemID = in.readInt();
         this.connectionStatus = (ConnectionStatus) in.readSerializable();
+        this.wasConnected = in.readByte() == 1;
 
         Log.d(TAG, "transmartServer has been read from parcel.");
         Log.d(TAG, "Server URL: "+ serverUrl);
@@ -94,6 +111,9 @@ public class TransmartServer implements Parcelable {
     public ConnectionStatus getConnectionStatus() {
         return connectionStatus;
     }
+    public boolean wasConnected() {
+        return wasConnected;
+    }
 
     // Setters
     public void setAccess_token(String access_token) {
@@ -113,8 +133,29 @@ public class TransmartServer implements Parcelable {
     public void setMenuItemID(int menuItemID) {
         this.menuItemID = menuItemID;
     }
-    public void setConnectionStatus(ConnectionStatus connectionStatus) {
-        this.connectionStatus = connectionStatus;
+
+    public void setNonUniqueConnectionStatus(ConnectionStatus connectionStatus) {
+        if (connectionStatus.isUnique()) {
+            throw new Error("Using setNonUniqueConnectionStatus for unique ConnectionStatus");
+        } else {
+            this.connectionStatus = connectionStatus;
+            if (connectionStatus == ConnectionStatus.CONNECTED) {
+                this.wasConnected = true;
+            }
+        }
+    }
+
+    public void setUniqueConnectionStatus(ConnectionStatus connectionStatus, List<TransmartServer> transmartServers) {
+        if (connectionStatus.isUnique()) {
+            for (TransmartServer transmartServer : transmartServers) {
+                if (transmartServer.getConnectionStatus() == connectionStatus && transmartServer != this){
+                    throw new Error("Setting unique connection status, but this status has not been made unique");
+                }
+            }
+            this.connectionStatus = connectionStatus;
+        } else {
+            throw new Error("Using setUniqueConnectionStatus for non-unique ConnectionStatus");
+        }
     }
 
     @Override

@@ -3,6 +3,7 @@ package nl.thehyve.transmartclient.oauth;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import nl.thehyve.transmartclient.rest.ServerResult;
@@ -19,9 +20,13 @@ public class TokenReceiver extends BroadcastReceiver {
     TokenReceivedListener mListener = null;
     @Override
     public void onReceive(Context context, Intent intent) {
-        ServerResult serverResult = intent.getParcelableExtra("serverResult");
-        Log.d(TAG, "serverResult = " + serverResult);
-        this.mListener.onTokenReceived(serverResult);
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            ServerResult serverResult = extras.getParcelable("serverResult");
+            boolean reconnect = extras.getBoolean("reconnect");
+            Log.d(TAG, " Token received in serverResult = " + serverResult);
+            this.mListener.onTokenReceived(serverResult, reconnect);
+        }
     }
 
     public void setTokenReceivedListener(TokenReceivedListener mListener){
@@ -29,6 +34,6 @@ public class TokenReceiver extends BroadcastReceiver {
     }
 
     public interface TokenReceivedListener {
-        void onTokenReceived(ServerResult serverResult);
+        void onTokenReceived(ServerResult serverResult, boolean reconnect);
     }
 }

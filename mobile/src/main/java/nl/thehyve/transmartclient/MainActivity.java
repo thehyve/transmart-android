@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -250,6 +251,11 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         return false;
+    }
+
+    @Override
+    public int getAddServerItem() {
+        return add_server_item;
     }
 
     private class OnTransmartNavigationItemSelectedListener implements NavigationView.OnNavigationItemSelectedListener {

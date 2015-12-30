@@ -249,15 +249,17 @@ public class GraphFragment extends Fragment {
                     restInteractionListener.connectionLost(transmartServer);
                 }
             } else {
-                String message = String.format(getString(R.string.server_responded_with),
-                        serverResult.getResponseCode(),
-                        serverResult.getResponseDescription());
-                Snackbar.make(rootView, message, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.snackbar_ok, new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                            }
-                        }).show();
+                if (isAdded()) {
+                    String message = String.format(getString(R.string.server_responded_with),
+                            serverResult.getResponseCode(),
+                            serverResult.getResponseDescription());
+                    Snackbar.make(rootView, message, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.snackbar_ok, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                }
+                            }).show();
+                }
             }
         }
     }

@@ -418,13 +418,13 @@ public class MainActivity extends AppCompatActivity implements
     protected void onPause() {
         Log.d(TAG, "--> onPause called");
         mBroadcastMgr.unregisterReceiver(tokenReceiver);
+        writeTransmartServersToFile();
         super.onPause();
     }
 
     @Override
     protected void onDestroy() {
         Log.d(TAG, "--> onDestroy called");
-        writeTransmartServersToFile();
         super.onDestroy();
     }
 

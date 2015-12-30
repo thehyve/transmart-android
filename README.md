@@ -1,5 +1,6 @@
 tranSMARTClient
 ===============
+[![Crowdin](https://d322cqt584bo4o.cloudfront.net/transmart-android/localized.svg)](https://crowdin.com/project/transmart-android)
 
 tranSMARTClient is an Android Client for TranSMART, which will enable you to browse the studies and its data on a tranSMART server.
 

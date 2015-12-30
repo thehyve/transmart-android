@@ -228,10 +228,10 @@ public class MainActivity extends AppCompatActivity implements
         // This method will trigger on item Click of navigation menu
         @Override
         public boolean onNavigationItemSelected(MenuItem menuItem) {
-            Integer menuItemId = menuItem.getItemId();
+            int menuItemId = menuItem.getItemId();
             Log.d(TAG,"Clicked on menuItem ID: "+ menuItemId);
 
-            if (!menuItemId.equals(about_item)) {
+            if (menuItemId != about_item) {
                 menuItem.setChecked(true);
 
                 //Closing drawer on item click
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             //Check to see which item was being clicked and perform appropriate action
-            if (menuItemId.equals(about_item)) {
+            if (menuItemId == about_item) {
                 Log.d(TAG,"Clicked about_item: "+ about_item);
 
                 // Get package version information
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
                 return true;
-            } else if (menuItemId.equals(add_server_item)) {
+            } else if (menuItemId == add_server_item) {
                 Log.d(TAG, "Clicked add_server_item: " + add_server_item);
 
                 Fragment fragment = new AddNewServerFragment();
@@ -289,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 for (TransmartServer transmartServer : transmartServers){
 
-                    if (menuItemId.equals(transmartServer.getMenuItemID())) {
+                    if (menuItemId == transmartServer.getMenuItemID()) {
                         Log.d(TAG,"Clicked transmartServer ID: "+ transmartServer.getMenuItemID());
 
                         Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
@@ -315,8 +315,8 @@ public class MainActivity extends AppCompatActivity implements
 
         menu.clear();
 
-        Integer order = 0;
-        Integer group = 1;
+        int order = 0;
+        int group = 1;
 
         SubMenu serverMenu = menu.addSubMenu(Menu.NONE, order, order, "Servers");
         order += 1;
@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(TAG,"Number of servers connected for menu: "+transmartServers.size());
         for (TransmartServer menuTransmartServer : transmartServers) {
             Log.d(TAG,"Added server label: "+menuTransmartServer.getServerLabel()+". ("+menuTransmartServer+")");
-            Integer menuItemID = serverMenu.add(group, order, order, menuTransmartServer.getServerLabel())
+            int menuItemID = serverMenu.add(group, order, order, transmartServer.getServerLabel())
                     .setIcon(R.drawable.ic_action_accounts)
                     .getItemId();
             menuTransmartServer.setMenuItemID(menuItemID);

@@ -18,7 +18,7 @@ public class TransmartServer implements Parcelable {
     String access_token;
     String refresh_token;
     String serverLabel;
-    Integer menuItemID;
+    int menuItemID;
     ConnectionStatus connectionStatus;
 
     public enum ConnectionStatus {
@@ -52,6 +52,7 @@ public class TransmartServer implements Parcelable {
         out.writeString(access_token);
         out.writeString(refresh_token);
         out.writeString(serverLabel);
+        out.writeInt(menuItemID);
         out.writeSerializable(connectionStatus);
 
         Log.d(TAG, "transmartServer has been written to parcel.");
@@ -65,6 +66,7 @@ public class TransmartServer implements Parcelable {
         this.access_token = in.readString();
         this.refresh_token = in.readString();
         this.serverLabel = in.readString();
+        this.menuItemID = in.readInt();
         this.connectionStatus = (ConnectionStatus) in.readSerializable();
 
         Log.d(TAG, "transmartServer has been read from parcel.");
@@ -86,7 +88,7 @@ public class TransmartServer implements Parcelable {
     public String getServerLabel() {
         return serverLabel;
     }
-    public Integer getMenuItemID() {
+    public int getMenuItemID() {
         return menuItemID;
     }
     public ConnectionStatus getConnectionStatus() {
@@ -108,7 +110,7 @@ public class TransmartServer implements Parcelable {
         this.serverLabel = serverLabel;
         Log.d(TAG, "Server label: "+ serverLabel);
     }
-    public void setMenuItemID(Integer menuItemID) {
+    public void setMenuItemID(int menuItemID) {
         this.menuItemID = menuItemID;
     }
     public void setConnectionStatus(ConnectionStatus connectionStatus) {

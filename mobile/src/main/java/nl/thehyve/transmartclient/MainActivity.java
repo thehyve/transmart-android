@@ -453,7 +453,7 @@ public class MainActivity extends AppCompatActivity implements
         try {
             URL url = new URL(serverUrl);
             if (serverLabel.equals("")) {
-                serverLabel = url.getPath();
+                serverLabel = url.getHost();
                 Log.d(TAG, "Set serverLabel to "+serverLabel);
             }
         } catch (MalformedURLException e) {

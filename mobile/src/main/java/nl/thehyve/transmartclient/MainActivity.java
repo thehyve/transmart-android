@@ -560,12 +560,7 @@ public class MainActivity extends AppCompatActivity implements
                     e.printStackTrace();
                 }
 
-                transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
-                refreshNavigationMenu();
-
-                hideKeyboard();
-
-                String message = String.format(reconnect ? getString(R.string.snackbar_reconnected)
+                String message = String.format(transmartServer.wasConnected() ? getString(R.string.snackbar_reconnected)
                         : getString(R.string.snackbar_connected),transmartServer.getServerLabel());
                 Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_LONG)
                         .setAction(R.string.snackbar_ok, new View.OnClickListener() {
@@ -573,6 +568,11 @@ public class MainActivity extends AppCompatActivity implements
                             public void onClick(View v) {
                             }
                         }).show();
+
+                transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
+                refreshNavigationMenu();
+
+                hideKeyboard();
 
                 Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
                 fragmentManager.beginTransaction()

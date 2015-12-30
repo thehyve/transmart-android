@@ -349,34 +349,36 @@ public class MainActivity extends AppCompatActivity implements
 
     private void refreshNavigationMenu() {
 
-
         NavigationView mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         final Menu menu = mNavigationView.getMenu();
+        List<TransmartServer> connectedServers = getConnectedServers();
 
         menu.clear();
 
         int order = 0;
         int group = 1;
 
-        SubMenu serverMenu = menu.addSubMenu(Menu.NONE, order, order, "Servers");
+        SubMenu serverMenu = menu.addSubMenu(Menu.NONE, order, order, getString(R.string.menu_serversSubmenu));
         order += 1;
 
-        Log.d(TAG,"Number of servers connected for menu: "+transmartServers.size());
-        for (TransmartServer menuTransmartServer : transmartServers) {
-            Log.d(TAG,"Added server label: "+menuTransmartServer.getServerLabel()+". ("+menuTransmartServer+")");
+        Log.d(TAG,"Number of servers connected for menu: "+connectedServers.size());
+        for (TransmartServer transmartServer : connectedServers) {
+            Log.d(TAG,"Added server: "+transmartServer);
             int menuItemID = serverMenu.add(group, order, order, transmartServer.getServerLabel())
                     .setIcon(R.drawable.ic_action_accounts)
                     .getItemId();
-            menuTransmartServer.setMenuItemID(menuItemID);
+            transmartServer.setMenuItemID(menuItemID);
             order += 1;
         }
-        add_server_item = serverMenu.add(group,order,order,"Add server").setIcon(R.drawable.ic_action_new_account).getItemId();
+        add_server_item = serverMenu.add(group,order,order,R.string.menu_addNewServer)
+                .setIcon(R.drawable.ic_action_new_account).getItemId();
         order += 1;
         Log.d(TAG, "Added add_server_item: " + add_server_item);
 
         serverMenu.setGroupCheckable(group, true, true);
 
-        about_item = menu.add(Menu.NONE,order,order,"About").setIcon(R.drawable.ic_action_about).getItemId();
+        about_item = menu.add(Menu.NONE,order,order,R.string.menu_about)
+                .setIcon(R.drawable.ic_action_about).getItemId();
         Log.d(TAG, "Added about_item: " + about_item);
     }
 
@@ -776,19 +778,14 @@ public class MainActivity extends AppCompatActivity implements
 
         FragmentTransaction ft = fragmentManager.beginTransaction();
         String fragmentName;
+        List<TransmartServer> connectedServers = getConnectedServers();
 
-        if (transmartServers.size() > 0) {
-            TransmartServer transmartServer = transmartServers.get(0);
-            Log.d(TAG, "Setting menu item " + transmartServer.getMenuItemID() + " to checked");
-            mNavigationView.setCheckedItem(transmartServer.getMenuItemID());
-
+        if (connectedServers.size() > 0) {
+            TransmartServer transmartServer = connectedServers.get(connectedServers.size()-1);
             Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
             ft.replace(R.id.content_frame, fragment);
             fragmentName = "ServerOverviewFragment";
         } else {
-            Log.d(TAG, "Setting menu item " + add_server_item + " to checked");
-            mNavigationView.setCheckedItem(add_server_item);
-
             Fragment fragment = new AddNewServerFragment();
             ft.replace(R.id.content_frame, fragment);
             fragmentName = "AddNewServerFragment";
@@ -803,15 +800,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void writeTransmartServersToFile() {
-        if (transmartServers.size() > 0) {
-            Log.d(TAG, "Writing: " + gson.toJson(transmartServers));
+        List<TransmartServer> notAbandonedServers = getNotAbandonedServers();
+
+        if (notAbandonedServers.size() > 0) {
+            String transmartServersJson = gson.toJson(notAbandonedServers);
+            Log.d(TAG, "Writing: " + transmartServersJson);
             try {
                 FileOutputStream fos = openFileOutput(serversFileName, MODE_MULTI_PROCESS);
                 PrintWriter pw = new PrintWriter(new BufferedWriter(
                         new OutputStreamWriter(fos)));
-                pw.println(gson.toJson(transmartServers));
+                pw.println(transmartServersJson);
                 pw.close();
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException | NullPointerException e) {
                 e.printStackTrace();
             }
         } else {

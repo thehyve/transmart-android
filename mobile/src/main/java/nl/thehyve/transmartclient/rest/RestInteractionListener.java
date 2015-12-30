@@ -9,5 +9,6 @@ package nl.thehyve.transmartclient.rest;
 public interface RestInteractionListener {
     void notConnectedYet(TransmartServer transmartServer);
     void authorizationLost(TransmartServer transmartServer);
+    void reconnectDialog(TransmartServer transmartServer);
     void connectionLost(TransmartServer transmartServer);
 }

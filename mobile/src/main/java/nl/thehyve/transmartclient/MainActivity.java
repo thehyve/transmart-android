@@ -475,10 +475,38 @@ public class MainActivity extends AppCompatActivity implements
         }
         Log.d(TAG, serverUrl);
 
-        TransmartServer transmartServer = new TransmartServer();
+        final TransmartServer transmartServer = new TransmartServer();
         transmartServer.setServerUrl(serverUrl);
         transmartServer.setServerLabel(serverLabel);
-        connectToTranSMARTServer(transmartServer);
+
+        boolean duplicate = false;
+        List<TransmartServer> connectedServers = getConnectedServers();
+
+        for (TransmartServer transmartServerOther : connectedServers) {
+            if (transmartServerOther.getServerUrl().equals(serverUrl)) {
+                duplicate = true;
+                break;
+            }
+        }
+
+        if (duplicate) {
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.duplicate_url)
+                    .setMessage(R.string.duplicate_url_text)
+                    .setIcon(R.drawable.ic_control_point_duplicate_black_24dp)
+                    .setPositiveButton(R.string.duplicate_url_positive, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            connectToTranSMARTServer(transmartServer);
+                        }
+                    })
+                    .setNegativeButton(R.string.duplicate_url_negative, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                        }
+                    })
+                    .show();
+        } else {
+            connectToTranSMARTServer(transmartServer);
+        }
     }
 
     public void connectToTranSMARTServer(TransmartServer transmartServer) {

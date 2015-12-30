@@ -294,7 +294,6 @@ public class MainActivity extends AppCompatActivity implements
                 int versionCode = pInfo.versionCode;
 
                 // Create message with links
-                // TODO insert Github icon with link
                 SpannableString s = new SpannableString(String.format(getString(R.string.about_text),
                         versionName,
                         versionCode));
@@ -326,9 +325,7 @@ public class MainActivity extends AppCompatActivity implements
                         .commit();
                 return true;
             } else {
-
-                for (TransmartServer transmartServer : transmartServers){
-
+                for (TransmartServer transmartServer : getConnectedServers()){
                     if (menuItemId == transmartServer.getMenuItemID()) {
                         Log.d(TAG,"Clicked transmartServer ID: "+ transmartServer.getMenuItemID());
 
@@ -463,7 +460,7 @@ public class MainActivity extends AppCompatActivity implements
             inputServerUrl.setError(getString(R.string.malformed_url));
             return;
         }
-        
+
         Resources res = getResources();
         String[] endings = res.getStringArray(R.array.url_endings);
         for (String ending : endings) {
@@ -520,7 +517,6 @@ public class MainActivity extends AppCompatActivity implements
                 + "&redirect_uri=" + "transmart://oauthresponse"
                 ;
 
-        // TODO make sharedpreferences unnecessary?
         // We need an Editor object to make preference changes.
         SharedPreferences settings = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
@@ -530,12 +526,11 @@ public class MainActivity extends AppCompatActivity implements
 
         // Commit the edits!
         editor.apply();
-        hideKeyboard();
 
         setUniqueConnectionStatus(transmartServer, TransmartServer.ConnectionStatus.SENTTOURL);
+
         if (!transmartServers.contains(transmartServer)) {
             transmartServers.add(transmartServer);
-            refreshNavigationMenu();
         }
         writeTransmartServersToFile();
 
@@ -641,7 +636,6 @@ public class MainActivity extends AppCompatActivity implements
 
     // Methods for RestInteractionListener interface
 
-
     @Override
     public void notConnectedYet(final TransmartServer transmartServer) {
         new AlertDialog.Builder(MainActivity.this)
@@ -682,11 +676,7 @@ public class MainActivity extends AppCompatActivity implements
                 })
                 .setNegativeButton(R.string.authorization_lost_negative, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // TODO make general for graph or server overview
-                        Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.content_frame, fragment)
-                                .commit();
+                        // User cancelled the dialog
                     }
                 })
                 .show();
@@ -700,10 +690,10 @@ public class MainActivity extends AppCompatActivity implements
                 .setIcon(R.drawable.ic_signal_cellular_connected_no_internet_4_bar_black_24dp)
                 .setPositiveButton(R.string.connection_lost_positive, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // TODO make general for graph or server overview
                         Fragment fragment = ServerOverviewFragment.newInstance(transmartServer);
                         fragmentManager.beginTransaction()
                                 .replace(R.id.content_frame, fragment)
+                                .addToBackStack("ServerOverviewFragment")
                                 .commit();
                     }
                 })
@@ -857,6 +847,14 @@ public class MainActivity extends AppCompatActivity implements
             Type listType = new TypeToken<ArrayList<TransmartServer>>() {}.getType();
             transmartServers = gson.fromJson(line,listType);
             br.close();
+
+            // Fix for old stored transmartServers that have no connectionStatus yet
+            for (TransmartServer transmartServer : transmartServers) {
+                if (transmartServer.getConnectionStatus() == null) {
+                    transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.CONNECTED);
+                    Log.d(TAG,"Set to connection status connected: "+transmartServer);
+                }
+            }
 
             if (transmartServers.size() > 0) {
                 Log.d(TAG, "Restored transmartServers");

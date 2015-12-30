@@ -30,7 +30,7 @@ public class TransmartServer implements Parcelable {
         CODERECEIVED         (true ),
         CONNECTED            (false),
         ACCESSTOKENEXPIRED   (false),
-        CODERECEIVEDRECONNECT(true ),
+        USEREFRESHTOKEN      (true ),
         REFRESHTOKENEXPIRED  (false);
 
         private final boolean unique;

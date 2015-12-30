@@ -23,9 +23,9 @@ public class TokenReceiver extends BroadcastReceiver {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             ServerResult serverResult = extras.getParcelable("serverResult");
-            boolean reconnect = extras.getBoolean("reconnect");
+            boolean userefreshtoken = extras.getBoolean("userefreshtoken");
             Log.d(TAG, " Token received in serverResult = " + serverResult);
-            this.mListener.onTokenReceived(serverResult, reconnect);
+            this.mListener.onTokenReceived(serverResult, userefreshtoken);
         }
     }
 
@@ -34,6 +34,6 @@ public class TokenReceiver extends BroadcastReceiver {
     }
 
     public interface TokenReceivedListener {
-        void onTokenReceived(ServerResult serverResult, boolean reconnect);
+        void onTokenReceived(ServerResult serverResult, boolean userefreshtoken);
     }
 }

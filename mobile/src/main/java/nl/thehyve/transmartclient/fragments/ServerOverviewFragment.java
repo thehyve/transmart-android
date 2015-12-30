@@ -87,7 +87,7 @@ public class ServerOverviewFragment extends Fragment {
             if (connectionStatus == TransmartServer.ConnectionStatus.CONNECTED) {
                 new StudiesGetter().execute();
             } else if (connectionStatus == TransmartServer.ConnectionStatus.ACCESSTOKENEXPIRED
-                    || connectionStatus == TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT) {
+                    || connectionStatus == TransmartServer.ConnectionStatus.USEREFRESHTOKEN) {
                 restInteractionListener.authorizationLost(transmartServer);
             } else if (connectionStatus == TransmartServer.ConnectionStatus.REFRESHTOKENEXPIRED) {
                 restInteractionListener.reconnectDialog(transmartServer);

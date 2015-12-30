@@ -531,13 +531,13 @@ public class MainActivity extends AppCompatActivity implements
 
     // Methods for TokenReceiver
 
-    public void onTokenReceived(ServerResult serverResult, boolean reconnect) {
+    public void onTokenReceived(ServerResult serverResult, boolean userefreshtoken) {
 
         Log.d(TAG, "onTokenReceived with serverResult: " + serverResult);
 
-        TransmartServer transmartServer = reconnect ?
+        TransmartServer transmartServer = userefreshtoken ?
             getUniqueConnectionStatus(
-                    TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT) :
+                    TransmartServer.ConnectionStatus.USEREFRESHTOKEN) :
             getUniqueConnectionStatus(
                     TransmartServer.ConnectionStatus.CODERECEIVED);
 
@@ -581,17 +581,17 @@ public class MainActivity extends AppCompatActivity implements
                         .commitAllowingStateLoss();
 
             } else if (serverResult.getResponseCode() == 401) {
-                if (reconnect) {
+                if (userefreshtoken) {
                     transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.REFRESHTOKENEXPIRED);
                     reconnectDialog(transmartServer);
                 }
             } else if (serverResult.getResponseCode() == 0) {
-                if (reconnect) {
+                if (userefreshtoken) {
                     transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.ACCESSTOKENEXPIRED);
                 }
                 connectionLost(transmartServer);
             } else {
-                if (reconnect) {
+                if (userefreshtoken) {
                     transmartServer.setNonUniqueConnectionStatus(TransmartServer.ConnectionStatus.ACCESSTOKENEXPIRED);
                 }
 
@@ -606,7 +606,7 @@ public class MainActivity extends AppCompatActivity implements
                         }).show();
             }
         } else {
-            Log.w(TAG,"No servers with connectionStatus: CODERECEIVED/CODERECEIVEDRECONNECT");
+            Log.w(TAG,"No servers with connectionStatus: CODERECEIVED/USEREFRESHTOKEN");
         }
     }
 
@@ -641,8 +641,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void authorizationLost(final TransmartServer transmartServer) {
-        if (transmartServer.getConnectionStatus() != TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT) {
-            setUniqueConnectionStatus(transmartServer, TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT);
+        if (transmartServer.getConnectionStatus() != TransmartServer.ConnectionStatus.USEREFRESHTOKEN) {
+            setUniqueConnectionStatus(transmartServer, TransmartServer.ConnectionStatus.USEREFRESHTOKEN);
             new TokenGetterTask(this.getApplicationContext(), transmartServer, CLIENT_ID, CLIENT_SECRET).execute();
         }
     }

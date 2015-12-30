@@ -110,7 +110,7 @@ public class GraphFragment extends Fragment {
             if (connectionStatus == TransmartServer.ConnectionStatus.CONNECTED) {
                 new ConceptsGetter().execute();
             } else if (connectionStatus == TransmartServer.ConnectionStatus.ACCESSTOKENEXPIRED
-                    || connectionStatus == TransmartServer.ConnectionStatus.CODERECEIVEDRECONNECT) {
+                    || connectionStatus == TransmartServer.ConnectionStatus.USEREFRESHTOKEN) {
                 restInteractionListener.authorizationLost(transmartServer);
             } else if (connectionStatus == TransmartServer.ConnectionStatus.REFRESHTOKENEXPIRED) {
                 restInteractionListener.reconnectDialog(transmartServer);

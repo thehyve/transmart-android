@@ -26,7 +26,7 @@ public class TokenGetterTask extends AsyncTask<Void, Void, ServerResult> {
     private String client_id;
     private String client_secret;
     private String code;
-    private boolean reconnect;
+    private boolean userefreshtoken;
 
     public TokenGetterTask(Context mContext, TransmartServer transmartServer,
                            String client_id, String client_secret, String code) {
@@ -35,7 +35,7 @@ public class TokenGetterTask extends AsyncTask<Void, Void, ServerResult> {
         this.client_id = client_id;
         this.client_secret = client_secret;
         this.code = code;
-        this.reconnect = false;
+        this.userefreshtoken = false;
     }
 
     public TokenGetterTask(Context mContext, TransmartServer transmartServer,
@@ -45,7 +45,7 @@ public class TokenGetterTask extends AsyncTask<Void, Void, ServerResult> {
         this.client_id = client_id;
         this.client_secret = client_secret;
         this.code = null;
-        this.reconnect = true;
+        this.userefreshtoken = true;
     }
 
     @Override
@@ -57,8 +57,7 @@ public class TokenGetterTask extends AsyncTask<Void, Void, ServerResult> {
 
         String query;
 
-        // TODO use was connected instead of reconnect
-        if (reconnect) {
+        if (userefreshtoken) {
 
             query = serverUrl + "/oauth/token?" +
                     "grant_type=refresh_token" +
@@ -87,12 +86,12 @@ public class TokenGetterTask extends AsyncTask<Void, Void, ServerResult> {
     protected void onPostExecute(ServerResult serverResult) {
         super.onPostExecute(serverResult);
 
-        Log.d(TAG,"Sending broadcast for serverResult with reconnect = "+reconnect);
+        Log.d(TAG,"Sending broadcast for serverResult with userefreshtoken = "+ userefreshtoken);
         LocalBroadcastManager mBroadcastMgr = LocalBroadcastManager
                 .getInstance(this.mContext);
         Intent i = new Intent(TOKEN_RECEIVED_INTENT);
         i.putExtra("serverResult", serverResult);
-        i.putExtra("reconnect", reconnect);
+        i.putExtra("userefreshtoken", userefreshtoken);
         // TODO pass along transmartServer or unique identifier for it
         mBroadcastMgr.sendBroadcast(i);
     }

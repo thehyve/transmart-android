@@ -28,6 +28,9 @@ public class AddNewServerFragment extends Fragment {
     private static final String ARG_WAITINGFORTOKEN = "waitingForToken";
     private static final String TAG = "AddNewServerFragment";
 
+    private OnFragmentInteractionListener mListener;
+    private MenuListener menuListener;
+
     private String serverUrl;
     private String serverLabel;
     private boolean waitingForToken;
@@ -99,8 +102,35 @@ public class AddNewServerFragment extends Fragment {
             }
         });
 
-//      TODO Set menuitem clicked from here
-
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        menuListener.setMenuItemChecked(mListener.getAddServerItem());
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            mListener = (OnFragmentInteractionListener) context;
+            menuListener = (MenuListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnFragmentInteractionListener" +
+                    " and MenuListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        menuListener = null;
+    }
+
+    public interface OnFragmentInteractionListener {
+        int getAddServerItem();
     }
 }

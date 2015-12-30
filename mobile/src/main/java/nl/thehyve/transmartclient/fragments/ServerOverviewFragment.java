@@ -42,6 +42,7 @@ public class ServerOverviewFragment extends Fragment {
     private static final String TAG = "ServerOverviewFragment";
     private OnFragmentInteractionListener mListener;
     private RestInteractionListener restInteractionListener;
+    private MenuListener menuListener;
 
     private TransmartServer transmartServer;
     private ArrayList<Study> studyList;
@@ -103,9 +104,7 @@ public class ServerOverviewFragment extends Fragment {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
 //      TODO Show waiting sign: "Retrieving studies"
-//      TODO Set menuitem clicked from here
 
-        getActivity().setTitle(R.string.serverOverview);
         return rootView;
     }
 
@@ -130,15 +129,24 @@ public class ServerOverviewFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().setTitle(transmartServer.getServerLabel());
+        menuListener.setMenuItemChecked(transmartServer.getMenuItemID());
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
             mListener = (OnFragmentInteractionListener) context;
             restInteractionListener = (RestInteractionListener) context;
+            menuListener = (MenuListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener" +
-                    " and RestInteractionListener");
+                    ", RestInteractionListener" +
+                    " and MenuListener");
         }
     }
 
@@ -146,6 +154,8 @@ public class ServerOverviewFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        restInteractionListener = null;
+        menuListener = null;
     }
 
     public class ServerListAdapter extends RecyclerView.Adapter<ServerListAdapter.ViewHolder> {

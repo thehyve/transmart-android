@@ -57,6 +57,7 @@ import com.google.gson.reflect.TypeToken;
 import android.support.v4.app.Fragment;
 
 import nl.thehyve.transmartclient.fragments.AddNewServerFragment;
+import nl.thehyve.transmartclient.fragments.MenuListener;
 import nl.thehyve.transmartclient.fragments.GraphFragment;
 import nl.thehyve.transmartclient.fragments.ServerOverviewFragment;
 import nl.thehyve.transmartclient.oauth.TokenGetterTask;
@@ -76,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements
         ServerOverviewFragment.OnFragmentInteractionListener,
         GraphFragment.OnFragmentInteractionListener,
         TokenReceiver.TokenReceivedListener,
+        AddNewServerFragment.OnFragmentInteractionListener,
+        MenuListener,
         RestInteractionListener {
 
     private static final String TAG = "MainActivity";
@@ -523,8 +526,13 @@ public class MainActivity extends AppCompatActivity implements
                 public void onClick(View v) {
                 }
             }).show();
+    // Methods for MenuListener interface
 
         }
+    @Override
+    public void setMenuItemChecked(int menuItem) {
+        Log.d(TAG, "Setting menu item " + menuItem + " to checked");
+        mNavigationView.setCheckedItem(menuItem);
     }
 
     // Methods for RestInteractionListener interface

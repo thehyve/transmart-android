@@ -173,6 +173,7 @@ public class GraphFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        restInteractionListener = null;
     }
 
     @Override

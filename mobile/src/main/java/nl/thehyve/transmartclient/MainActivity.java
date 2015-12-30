@@ -791,10 +791,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private void writeTransmartServersToFile() {
         List<TransmartServer> notAbandonedServers = getNotAbandonedServers();
+        Log.d(TAG, "Writing servers to file");
 
         if (notAbandonedServers.size() > 0) {
             String transmartServersJson = gson.toJson(notAbandonedServers);
-            Log.d(TAG, "Writing: " + transmartServersJson);
+            Log.d(TAG, "Writing to "+serversFileName+": " + transmartServersJson);
             try {
                 FileOutputStream fos = openFileOutput(serversFileName, MODE_MULTI_PROCESS);
                 PrintWriter pw = new PrintWriter(new BufferedWriter(

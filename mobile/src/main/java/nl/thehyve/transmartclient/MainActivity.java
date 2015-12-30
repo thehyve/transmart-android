@@ -421,11 +421,17 @@ public class MainActivity extends AppCompatActivity implements
             inputServerUrl.setError(getString(R.string.malformed_url));
             return;
         }
-
-        if (serverUrl.substring(serverUrl.length()-1).equals("/")) {
-            serverUrl = serverUrl.substring(0,serverUrl.length()-1);
-            Log.d(TAG,"Removed trailing /: "+serverUrl);
+        
+        Resources res = getResources();
+        String[] endings = res.getStringArray(R.array.url_endings);
+        for (String ending : endings) {
+            if (serverUrl.endsWith(ending)) {
+                serverUrl = serverUrl.substring(0,serverUrl.length()-ending.length());
+                Log.d(TAG,"Removed ending: "+ending);
+                break;
+            }
         }
+        Log.d(TAG, serverUrl);
 
         TransmartServer transmartServer = new TransmartServer();
         transmartServer.setServerUrl(serverUrl);

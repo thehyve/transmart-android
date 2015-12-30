@@ -35,12 +35,6 @@ public class ServerResult implements Parcelable {
         this.result = "";
     }
 
-    public ServerResult(int responseCode, String responseDescription, String result) {
-        this.responseCode = responseCode;
-        this.responseDescription = responseDescription;
-        this.result = result;
-    }
-
     public ServerResult(Parcel in) {
         readFromParcel(in);
         Log.d(TAG, "ServerResult has been instantiated from parcel.");

@@ -278,8 +278,7 @@ public class GraphFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-            String conceptLink = null;
-            conceptLink = TextUtils.join("/", fullName);
+            String conceptLink = TextUtils.join("/", fullName);
             Log.d(TAG,"conceptLink: " + conceptLink);
             ServerResult serverResult = new ServerResult();
 

@@ -8,8 +8,8 @@ android {
         applicationId "nl.thehyve.transmartclient"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 16
-        versionName "0.9.1"
+        versionCode 17
+        versionName "0.9.2"
     }
     buildTypes {
         release {

@@ -52,12 +52,10 @@ public class TransmartServer implements Parcelable {
         this.serverLabel = "";
         this.connectionStatus = null;
         this.wasConnected = false;
-        Log.d(TAG, "transmartServer has been instantiated from scratch.");
     }
     // Constructor to use when re-constructing object from a parcel
     public TransmartServer(Parcel in) {
         readFromParcel(in);
-        Log.d(TAG, "transmartServer has been instantiated from parcel.");
     }
 
     // Method to write the data to a Parcel
@@ -70,10 +68,6 @@ public class TransmartServer implements Parcelable {
         out.writeInt(menuItemID);
         out.writeSerializable(connectionStatus);
         out.writeByte((byte) (wasConnected ? 1 : 0));
-
-        Log.d(TAG, "transmartServer has been written to parcel.");
-        Log.d(TAG, "Server URL: " + serverUrl);
-        Log.d(TAG, "Server label: "+ serverLabel);
     }
 
     // Method to read the data from a Parcel
@@ -85,10 +79,6 @@ public class TransmartServer implements Parcelable {
         this.menuItemID = in.readInt();
         this.connectionStatus = (ConnectionStatus) in.readSerializable();
         this.wasConnected = in.readByte() == 1;
-
-        Log.d(TAG, "transmartServer has been read from parcel.");
-        Log.d(TAG, "Server URL: "+ serverUrl);
-        Log.d(TAG, "Server label: "+ serverLabel);
     }
 
     // Getters
@@ -99,7 +89,6 @@ public class TransmartServer implements Parcelable {
         return refresh_token;
     }
     public String getServerUrl() {
-        Log.d(TAG,"Asked for serverUrl: " + serverUrl);
         return serverUrl;
     }
     public String getServerLabel() {
@@ -124,11 +113,9 @@ public class TransmartServer implements Parcelable {
     }
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
-        Log.d(TAG,"Set serverUrl to " + serverUrl);
     }
     public void setServerLabel(String serverLabel) {
         this.serverLabel = serverLabel;
-        Log.d(TAG, "Server label: "+ serverLabel);
     }
     public void setMenuItemID(int menuItemID) {
         this.menuItemID = menuItemID;
@@ -169,19 +156,16 @@ public class TransmartServer implements Parcelable {
             = new Parcelable.Creator<TransmartServer>() {
 
         public TransmartServer createFromParcel(Parcel in) {
-            Log.d(TAG,"Called createFromParcel");
             return new TransmartServer(in);
         }
 
         public TransmartServer[] newArray(int size) {
-            Log.d(TAG,"Called newArray");
             return new TransmartServer[size];
         }
     };
 
     @Override
     public int describeContents() {
-        Log.d(TAG,"Called describeContents");
         return 0;
     }
 }

@@ -358,9 +358,7 @@ public class MainActivity extends AppCompatActivity implements
         SubMenu serverMenu = menu.addSubMenu(Menu.NONE, order, order, getString(R.string.menu_serversSubmenu));
         order += 1;
 
-        Log.d(TAG,"Number of servers connected for menu: "+connectedServers.size());
         for (TransmartServer transmartServer : connectedServers) {
-            Log.d(TAG,"Added server: "+transmartServer);
             int menuItemID = serverMenu.add(group, order, order, transmartServer.getServerLabel())
                     .setIcon(R.drawable.ic_action_accounts)
                     .getItemId();
@@ -370,13 +368,11 @@ public class MainActivity extends AppCompatActivity implements
         add_server_item = serverMenu.add(group,order,order,R.string.menu_addNewServer)
                 .setIcon(R.drawable.ic_action_new_account).getItemId();
         order += 1;
-        Log.d(TAG, "Added add_server_item: " + add_server_item);
 
         serverMenu.setGroupCheckable(group, true, true);
 
         about_item = menu.add(Menu.NONE,order,order,R.string.menu_about)
                 .setIcon(R.drawable.ic_action_about).getItemId();
-        Log.d(TAG, "Added about_item: " + about_item);
     }
 
     @Override

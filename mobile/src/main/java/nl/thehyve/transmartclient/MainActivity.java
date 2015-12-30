@@ -390,24 +390,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onStop() {
-        Log.d(TAG, "--> onStop called");
-        super.onStop();
-    }
-
-    @Override
-    protected void onStart() {
-        Log.d(TAG, "--> onStart called");
-        super.onStart();
-    }
-
-    @Override
-    protected void onRestart() {
-        Log.d(TAG, "--> onRestart called");
-        super.onRestart();
-    }
-
-    @Override
     protected void onResume() {
         Log.d(TAG, "--> onResume called");
         mBroadcastMgr.registerReceiver(tokenReceiver, intentFilter);
@@ -420,12 +402,6 @@ public class MainActivity extends AppCompatActivity implements
         mBroadcastMgr.unregisterReceiver(tokenReceiver);
         writeTransmartServersToFile();
         super.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.d(TAG, "--> onDestroy called");
-        super.onDestroy();
     }
 
     // This is the method that is called when the submit button is clicked

@@ -117,6 +117,10 @@ public class TransmartServer implements Parcelable {
         this.connectionStatus = connectionStatus;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s (%s, %s)",serverLabel,serverUrl, hashCode());
+    }
 
     // Other obligatory stuff for Parcelable
 

@@ -106,6 +106,11 @@ public class ServerResult implements Parcelable {
         Log.d(TAG, "ServerResult has been read from parcel.");
     }
 
+    @Override
+    public String toString() {
+        return "ServerResult@"+hashCode()+": [code="+responseCode+", description="+responseDescription+", result="+result+"]";
+    }
+
     public ServerResult getServerResult(String access_token, String query) {
         URL url;
         String responseLine;

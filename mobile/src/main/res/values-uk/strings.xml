@@ -5,28 +5,38 @@
   <string name="app_display_name">TranSMART</string>
   <string name="navigation_drawer_open">Відкрити навігацію</string>
   <string name="navigation_drawer_close">Закрити навігацію</string>
-  <string name="serverUrl">URL до вашого tranSMART серверу</string>
-  <string name="serverLabel">Позначка (опціонально)</string>
-  <string name="button_submit">Підключитись</string>
-  <string name="no_server_url_specified">Будь ласка, введіть URL tranSMART-у спочатку</string>
-  <string name="malformed_url">Будь ласка, почніть з http:// або https://</string>
-  <string name="no_app_for_url">Немає встановленого застосунку, щоб відкрити цю URL-адресу</string>
-  <string name="server_responded_with">Сервер відповів %1$s код: %2$s</string>
-  <string name="addServerText">Приклад:</string>
-  <string name="labelExample">The Hyve Demo</string>
-  <string name="addServerText2">Увійдіть під користувачем \"user\" та паролем \"user\".</string>
-  <string name="studyOverviewIntro">Нижче наведені дослідження доступні на цьому сервері tranSMART.</string>
   <string name="contentDescriptionHeader">TranSMART Client зображення</string>
   <string name="menu_serversSubmenu">Сервери</string>
   <string name="menu_addNewServer">Додати сервер</string>
   <string name="menu_about">Інформація</string>
-  <string name="serverOverview">Короткий опис серверу</string>
-  <string name="addnewserver">Додати новий сервер</string>
   <string name="info_title">Розроблено в The Hyve</string>
+  <string name="info_positive">Гаразд</string>
+  <string name="about_text">Версія %1$s (версія код %2$s) \n
+\nМи розробляємо рішення з відкритим кодом для біоінформатики. Нас можна знайти за адресою http://thehyve.nl \n
+\nЦей код ліцензований під ліцензією GNU Lesser General Public License, версії 3, або (за вашим бажанням) будь-якої пізнішої версії. \n
+\nДолучайтесь до розробки https://github.com/wardweistra/tranSMARTClient</string>
+  <string name="snackbar_connected">Підключення до %s</string>
+  <string name="snackbar_reconnected">Повторне підключення до %s</string>
   <string name="snackbar_ok">Гаразд</string>
-  <string name="check_internet">Переконайтесь, що підключення до Інтернету все ще працює.</string>
-  <string name="contentDescHelpImage">Зображення допомоги</string>
+  <string name="addnewserver">Додати новий сервер</string>
+  <string name="serverUrl">URL до вашого tranSMART серверу</string>
+  <string name="serverLabel">Позначка (опціонально)</string>
+  <string name="button_submit">Підключитись</string>
+  <string name="addServerText">Приклад:</string>
+  <string name="labelExample">The Hyve Demo</string>
+  <string name="addServerText2">Увійдіть під користувачем \"user\" та паролем \"user\".</string>
+  <string name="no_server_url_specified">Будь ласка, введіть URL tranSMART-у спочатку</string>
+  <string name="malformed_url">Будь ласка, почніть з http:// або https://</string>
+  <string name="no_app_for_url">Немає встановленого застосунку, щоб відкрити цю URL-адресу</string>
+  <string name="server_responded_with">Сервер відповів %1$s код: %2$s</string>
+  <string name="duplicate_url">Дублювати URL</string>
+  <string name="duplicate_url_text">Ви вже підключились до серверу з цією URL-адресою. Підключення до сервера двічі з цього ж імені користувача призведе до непередбачуваної поведінки. Ви дійсно бажаєте підключитись до цього серверу знову?</string>
+  <string name="duplicate_url_positive">Підключення незважаючи ні на що</string>
+  <string name="duplicate_url_negative">Скасувати</string>
+  <string name="studyOverviewIntro">Нижче наведені дослідження доступні на цьому сервері tranSMART.</string>
   <string name="action_removeServer">Видалити сервер</string>
+  <string name="action_refresh">Оновити</string>
+  <string name="action_reconnectServerDialog">Повторне підключення</string>
   <string name="sure_remove_server">Видалити сервер?</string>
   <string name="sure_remove_server_text">Ви дійсно бажаєте видалити цей сервер?</string>
   <string name="sure_remove_server_positive">Видалити</string>
@@ -39,21 +49,8 @@
   <string name="authorization_lost_text">Сервер tranSMART забув, що ви дали дозвіл цьому застосунку на доступ до ваших даних. Ви хочете зєднатися знову?</string>
   <string name="authorization_lost_positive">Повторне підключення</string>
   <string name="authorization_lost_negative">Скасувати</string>
-  <string name="info_positive">Гаразд</string>
-  <string name="about_text">Версія %1$s (версія код %2$s) \n
-\nМи розробляємо рішення з відкритим кодом для біоінформатики. Нас можна знайти за адресою http://thehyve.nl \n
-\nЦей код ліцензований під ліцензією GNU Lesser General Public License, версії 3, або (за вашим бажанням) будь-якої пізнішої версії. \n
-\nДолучайтесь до розробки https://github.com/wardweistra/tranSMARTClient</string>
   <string name="not_connected_yet">Ще не підключено</string>
   <string name="not_connected_yet_text">Будь ласка, не забудьте увійти до tranSMART і авторизувати цей застосунок на доступ до ваших даних.</string>
   <string name="not_connected_yet_positive">Підключитись</string>
   <string name="not_connected_yet_negative">Скасувати</string>
-  <string name="action_refresh">Оновити</string>
-  <string name="action_reconnectServerDialog">Повторне підключення</string>
-  <string name="snackbar_reconnected">Повторне підключення до %s</string>
-  <string name="snackbar_connected">Підключення до %s</string>
-  <string name="duplicate_url">Дублювати URL</string>
-  <string name="duplicate_url_text">Ви вже підключились до серверу з цією URL-адресою. Підключення до сервера двічі з цього ж імені користувача призведе до непередбачуваної поведінки. Ви дійсно бажаєте підключитись до цього серверу знову?</string>
-  <string name="duplicate_url_positive">Підключення незважаючи ні на що</string>
-  <string name="duplicate_url_negative">Скасувати</string>
 </resources>

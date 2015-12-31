@@ -1,72 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- General app strings -->
     <string name="app_name">TranSMART Client</string>
     <string name="app_display_name">TranSMART</string>
+
+    <!-- Navigation drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <!-- Add new server -->
-    <string name="serverUrl">URL to your tranSMART server</string>
-    <string name="serverLabel">Label (optional)</string>
-    <string name="button_submit">Connect</string>
-    <string name="no_server_url_specified">Please enter your tranSMART URL first</string>
-    <string name="malformed_url">Please start with http:// or https://</string>
-    <string name="no_app_for_url">No app installed to open this URL</string>
-    <string name="server_responded_with">Server responded with code %1$s: %2$s</string>
-    <string name="addServerText">Example:</string>
-    <string name="urlExample" translatable="false">http://transmart-demo.thehyve.net/transmart</string>
-    <string name="labelExample">The Hyve Demo</string>
-    <string name="addServerText2">Log in with user and pass \'user\'.</string>
-
-    <!-- Server overview -->
-    <string name="studyOverviewIntro">Below are the studies in this tranSMART server.</string>
-
-    <!-- Menu items -->
     <string name="contentDescriptionHeader">TranSMART Client header image</string>
     <string name="menu_serversSubmenu">Servers</string>
     <string name="menu_addNewServer">Add server</string>
     <string name="menu_about">About</string>
-
-    <!-- Fragment titles -->
-    <string name="serverOverview">Server overview</string>
-    <string name="addnewserver">Add a new server</string>
-
+    <!-- About dialog -->
     <string name="info_title">Developed at The Hyve</string>
-
-    <string name="snackbar_ok">OK</string>
-    <string name="check_internet">Make sure that your internet connection is still working.</string>
-    <string name="contentDescHelpImage">Help image</string>
-    <string name="action_removeServer">Remove server</string>
-    <string name="sure_remove_server">Remove server?</string>
-    <string name="sure_remove_server_text">Are you sure you want to remove this server?</string>
-    <string name="sure_remove_server_positive">Remove</string>
-    <string name="sure_remove_server_negative">Cancel</string>
-    <string name="connection_lost">Connection lost</string>
-    <string name="connection_lost_text">We seem to be unable to reach the tranSMART server. Please check your internet connection and try again.</string>
-    <string name="connection_lost_positive">Try again</string>
-    <string name="connection_lost_negative">Cancel</string>
-    <string name="authorization_lost">Reconnect to server?</string>
-    <string name="authorization_lost_text">The tranSMART server has forgotten that you have given this app permission to access your data. Do you want to reconnect?</string>
-    <string name="authorization_lost_positive">Reconnect</string>
-    <string name="authorization_lost_negative">Cancel</string>
     <string name="info_positive">Cool</string>
     <string name="about_text">Version %1$s (version code %2$s)\n
         \nWe provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n
         \nThis code is licensed under the GNU Lesser General Public License, version 3, or (at your option) any later version.\n
         \nContribute at https://github.com/wardweistra/tranSMARTClient</string>
-    <string name="not_connected_yet">Not connected yet</string>
-    <string name="not_connected_yet_text">Please make sure to login to tranSMART and authorize this application to access your data.</string>
-    <string name="not_connected_yet_positive">Connect</string>
-    <string name="not_connected_yet_negative">Cancel</string>
-    <string name="action_refresh">Refresh</string>
-    <string name="action_reconnectServerDialog">Reconnect</string>
-    <string name="snackbar_reconnected">Reconnected to %s</string>
+
+    <!-- Shared snackbars-->
     <string name="snackbar_connected">Connected to %s</string>
+    <string name="snackbar_reconnected">Reconnected to %s</string>
+    <string name="received_empty_code">Received empty OAuth code</string>
+    <string name="snackbar_ok">OK</string>
+
+    <!-- Add new server fragment -->
+    <!-- UI -->
+    <string name="addnewserver">Add a new server</string>
+    <string name="serverUrl">URL to your tranSMART server</string>
+    <string name="serverLabel">Label (optional)</string>
+    <string name="button_submit">Connect</string>
+    <string name="addServerText">Example:</string>
+    <string name="urlExample" translatable="false">http://transmart-demo.thehyve.net/transmart</string>
+    <string name="labelExample">The Hyve Demo</string>
+    <string name="addServerText2">Log in with user and pass \'user\'.</string>
+    <!-- Error messages -->
+    <string name="no_server_url_specified">Please enter your tranSMART URL first</string>
+    <string name="malformed_url">Please start with http:// or https://</string>
+    <string name="no_app_for_url">No app installed to open this URL</string>
+    <string name="server_responded_with">Server responded with code %1$s: %2$s</string>
+    <!-- Duplicate URL dialog -->
     <string name="duplicate_url">Duplicate URL</string>
     <string name="duplicate_url_text">You have already connected a server with this URL. Connecting to the same server twice with the same username will result in unexpected behaviour. Are you sure you want to connect this server again?</string>
     <string name="duplicate_url_positive">Connect anyway</string>
     <string name="duplicate_url_negative">Cancel</string>
-    <string name="received_empty_code">Received empty OAuth code</string>
+
+    <!-- Server overview fragment -->
+    <!-- UI -->
+    <string name="studyOverviewIntro">Below are the studies in this tranSMART server.</string>
+    <!-- Context menu -->
+    <string name="action_removeServer">Remove server</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_reconnectServerDialog">Reconnect</string>
+    <!-- Remove server dialog -->
+    <string name="sure_remove_server">Remove server?</string>
+    <string name="sure_remove_server_text">Are you sure you want to remove this server?</string>
+    <string name="sure_remove_server_positive">Remove</string>
+    <string name="sure_remove_server_negative">Cancel</string>
+    <!-- Connection lost dialog-->
+    <string name="connection_lost">Connection lost</string>
+    <string name="connection_lost_text">We seem to be unable to reach the tranSMART server. Please check your internet connection and try again.</string>
+    <string name="connection_lost_positive">Try again</string>
+    <string name="connection_lost_negative">Cancel</string>
+    <!-- Authorization lost dialog -->
+    <string name="authorization_lost">Reconnect to server?</string>
+    <string name="authorization_lost_text">The tranSMART server has forgotten that you have given this app permission to access your data. Do you want to reconnect?</string>
+    <string name="authorization_lost_positive">Reconnect</string>
+    <string name="authorization_lost_negative">Cancel</string>
+    <!-- Not connected yet dialog -->
+    <string name="not_connected_yet">Not connected yet</string>
+    <string name="not_connected_yet_text">Please make sure to login to tranSMART and authorize this application to access your data.</string>
+    <string name="not_connected_yet_positive">Connect</string>
+    <string name="not_connected_yet_negative">Cancel</string>
 
 </resources>

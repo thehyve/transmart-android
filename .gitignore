@@ -5,5 +5,9 @@
 .DS_Store
 /build
 *.apk
+*.iml
 manifest-merger-release-report.txt
 ward.xml
+google-services.json
+projectFilesBackup
+misc.xml

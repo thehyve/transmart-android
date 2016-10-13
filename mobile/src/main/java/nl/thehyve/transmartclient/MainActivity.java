@@ -273,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements
 
         DrawerLayout drawer;
 
-        public OnTransmartNavigationItemSelectedListener(DrawerLayout drawer) {
+        OnTransmartNavigationItemSelectedListener(DrawerLayout drawer) {
             this.drawer = drawer;
         }
 

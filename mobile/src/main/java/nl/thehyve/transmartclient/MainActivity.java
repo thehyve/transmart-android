@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements
         Log.d(TAG, "--> onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FirebaseApp.initializeApp(getApplicationContext());
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

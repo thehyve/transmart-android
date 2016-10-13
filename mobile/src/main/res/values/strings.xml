@@ -15,10 +15,7 @@
     <!-- About dialog -->
     <string name="info_title">Developed at The Hyve</string>
     <string name="info_positive">Cool</string>
-    <string name="about_text">Version %1$s (version code %2$s)\n
-        \nWe provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n
-        \nThis code is licensed under the GNU Lesser General Public License, version 3, or (at your option) any later version.\n
-        \nContribute at https://github.com/wardweistra/tranSMARTClient</string>
+    <string name="about_text">Version %1$s (version code %2$d)\n\n        \nWe provide open source solutions for bioinformatics. Find us at http://thehyve.nl\n\n        \nThis code is licensed under the GNU Lesser General Public License, version 3, or (at your option) any later version.\n\n        \nContribute at https://github.com/thehyve/transmart-android</string>
 
     <!-- Shared snackbars-->
     <string name="snackbar_connected">Connected to %s</string>
@@ -40,7 +37,7 @@
     <string name="no_server_url_specified">Please enter your tranSMART URL first</string>
     <string name="malformed_url">Please start with http:// or https://</string>
     <string name="no_app_for_url">No app installed to open this URL</string>
-    <string name="server_responded_with">Server responded with code %1$s: %2$s</string>
+    <string name="server_responded_with">Server responded with code %1$d: %2$s</string>
     <!-- Duplicate URL dialog -->
     <string name="duplicate_url">Duplicate URL</string>
     <string name="duplicate_url_text">You have already connected a server with this URL. Connecting to the same server twice with the same username will result in unexpected behaviour. Are you sure you want to connect this server again?</string>

@@ -11,7 +11,7 @@
   <string name="menu_about">Info</string>
   <string name="info_title">Ontwikkeld door The Hyve</string>
   <string name="info_positive">Cool</string>
-  <string name="about_text">Versie %1$s (versiecode %2$s)\n         \nWij bieden open source oplossingen voor de bioinformatica. Vind ons op http://thehyve.nl\n         \nDe licensie van deze code is de GNU Lesser General Public License, versie 3, of (naar jouw keuze) elke volgende versie.\n         \nDraag bij op https://github.com/wardweistra/tranSMARTClient</string>
+  <string name="about_text">Versie %1$s (versiecode %2$d)\n         \nWij bieden open source oplossingen voor de bioinformatica. Vind ons op http://thehyve.nl\n         \nDe licensie van deze code is de GNU Lesser General Public License, versie 3, of (naar jouw keuze) elke volgende versie.\n         \nDraag bij op https://github.com/thehyve/transmart-android</string>
   <string name="snackbar_connected">Verbonden met %s</string>
   <string name="snackbar_reconnected">Opnieuw verbonden met %s</string>
   <string name="received_empty_code">Lege OAuth code ontvangen</string>
@@ -26,7 +26,7 @@
   <string name="no_server_url_specified">Vul eerst je tranSMART URL in</string>
   <string name="malformed_url">Begin met http:// of https://</string>
   <string name="no_app_for_url">Geen app geinstalleerd om deze URL te openen</string>
-  <string name="server_responded_with">Server reageerde met code %1$s: %2$s</string>
+  <string name="server_responded_with">Server reageerde met code %1$d: %2$s</string>
   <string name="duplicate_url">Dubbele URL</string>
   <string name="duplicate_url_text">Je hebt al een server met deze URL verbonden. Wanneer je meerdere servers met de zelfde URL en gebruikersnaam verbindt levert dat onverwachte problemen op. Weet je zeker dat je deze server toch nogmaals toe wil voegen?</string>
   <string name="duplicate_url_positive">Toch verbinden</string>

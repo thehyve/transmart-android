@@ -522,9 +522,8 @@ public class MainActivity extends AppCompatActivity implements
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            String message = String.format(getString(R.string.no_app_for_url), transmartServer.getServerUrl());
             TextInputLayout inputServerUrl = (TextInputLayout) findViewById(R.id.input_server_url);
-            inputServerUrl.setError(message);
+            inputServerUrl.setError(getString(R.string.no_app_for_url));
         }
 
     }

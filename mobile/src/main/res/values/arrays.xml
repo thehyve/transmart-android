@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="url_endings">
+    <string-array name="url_endings" translatable="false">
         <item>/login/auth</item>
         <item>/login/forceAuth</item>
         <item>/RWG</item>
